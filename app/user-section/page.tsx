@@ -7,26 +7,58 @@ import {
   BarChart3,
   MessageSquare,
   FileText,
-  Clock,
+  History,
   Settings,
   HelpCircle,
   Github,
   Mail,
   ChevronLeft,
-  Upload,
-  ArrowUp,
+  ChevronRight,
   Sparkles,
+  Send,
+  Upload,
+  Download,
   Copy,
-  Trash2,
+  Link2,
   Plus,
+  TrendingUp,
+  TrendingDown,
+  Wallet,
+  User,
+  Newspaper,
+  Trash2,
 } from "lucide-react"
 
 export default function UserSectionPage() {
   const router = useRouter()
-  const [activeSection, setActiveSection] = useState("Ask Setu")
+  const [activeSection, setActiveSection] = useState("Home")
   const [messages, setMessages] = useState<Array<{ type: "user" | "bot"; text: string }>>([])
   const [inputValue, setInputValue] = useState("")
   const [isProcessing, setIsProcessing] = useState(false)
+
+  const newsItems = [
+    {
+      id: 1,
+      title: "RBI announces new monetary policy decisions for Q4 2024",
+      source: "Google News",
+      time: "2h ago",
+      url: "#",
+    },
+    {
+      id: 2,
+      title: "New tax regulations for startups in India announced",
+      source: "Instagram",
+      time: "5h ago",
+      url: "#",
+    },
+    {
+      id: 3,
+      title: "Stock market hits all-time high amid economic recovery",
+      source: "Google News",
+      time: "8h ago",
+      url: "#",
+    },
+  ]
 
   const chatHistory = [
     {
@@ -91,7 +123,7 @@ export default function UserSectionPage() {
     { name: "Analysis", icon: BarChart3 },
     { name: "Ask Setu", icon: MessageSquare },
     { name: "Financial Summaries", icon: FileText },
-    { name: "Chat History", icon: Clock },
+    { name: "Chat History", icon: History },
   ]
 
   const bottomMenuItems = [
@@ -203,6 +235,186 @@ export default function UserSectionPage() {
       </aside>
 
       <main className="flex-1 bg-white flex flex-col">
+        {activeSection === "Home" && (
+          <div className="flex-1 flex flex-col bg-[#f9fafb] p-8 gap-6 overflow-y-auto">
+            {/* User Profile and Ask Setu cards side by side */}
+            <div className="grid grid-cols-2 gap-6">
+              {/* User Profile Card */}
+              <div className="bg-white border border-[#e5e5e5] rounded-2xl p-6">
+                <h2
+                  className="text-lg font-semibold text-[#6b7280] mb-6"
+                  style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                >
+                  User Profile
+                </h2>
+                <div className="flex flex-col gap-6">
+                  {/* Avatar */}
+                  <div className="w-20 h-20 bg-[#f3f4f6] rounded-full flex items-center justify-center mx-auto">
+                    <User className="w-10 h-10 text-[#6b7280]" />
+                  </div>
+
+                  {/* User Details */}
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p
+                          className="text-sm text-[#6b7280] mb-1"
+                          style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                        >
+                          Name
+                        </p>
+                        <p
+                          className="text-base font-medium text-[#202020]"
+                          style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                        >
+                          Abby Cooper
+                        </p>
+                      </div>
+                      <div>
+                        <p
+                          className="text-sm text-[#6b7280] mb-1"
+                          style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                        >
+                          Date of Joining
+                        </p>
+                        <p
+                          className="text-base font-medium text-[#202020]"
+                          style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                        >
+                          July 25, 2018
+                        </p>
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-sm text-[#6b7280] mb-1" style={{ fontFamily: "var(--font-figtree), Figtree" }}>
+                        Material Status
+                      </p>
+                      <p
+                        className="text-base font-medium text-[#202020]"
+                        style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                      >
+                        Married
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-[#6b7280] mb-1" style={{ fontFamily: "var(--font-figtree), Figtree" }}>
+                        Address
+                      </p>
+                      <p
+                        className="text-base font-medium text-[#202020]"
+                        style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                      >
+                        7529 E Pecan St. Portland Illinois 29125 United States
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Ask Setu Interface Card */}
+              <button
+                onClick={() => setActiveSection("Ask Setu")}
+                className="bg-white border border-[#e5e5e5] rounded-2xl p-6 hover:shadow-md transition-all group h-full"
+              >
+                <div className="flex flex-col items-center justify-center h-full">
+                  {/* Logo Icon */}
+                  <div className="mb-6 relative">
+                    <div className="w-16 h-16 bg-white border-2 border-[#202020] rounded-2xl rotate-45 flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <div className="w-6 h-6 bg-[#202020] rounded -rotate-45"></div>
+                    </div>
+                  </div>
+
+                  {/* Heading */}
+                  <h2
+                    className="text-2xl font-semibold text-[#202020] mb-3"
+                    style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                  >
+                    How can I help today?
+                  </h2>
+
+                  {/* Subtitle */}
+                  <p className="text-[#6b7280] mb-6" style={{ fontFamily: "var(--font-figtree), Figtree" }}>
+                    Click here to start chatting with Setu
+                  </p>
+
+                  {/* Input Field Preview */}
+                  <div className="w-full max-w-sm">
+                    <div className="flex items-center gap-3 bg-[#f9fafb] border border-[#e5e5e5] rounded-2xl px-4 py-3 pointer-events-none">
+                      <MessageSquare className="w-5 h-5 text-[#9ca3af]" />
+                      <span
+                        className="flex-1 text-[#9ca3af] text-left"
+                        style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                      >
+                        Ask anything...
+                      </span>
+                      <Send className="w-5 h-5 text-[#9ca3af]" />
+                    </div>
+                  </div>
+                </div>
+              </button>
+            </div>
+
+            {/* News Feed Card */}
+            <div className="bg-white border border-[#e5e5e5] rounded-2xl p-6">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-2">
+                  <Newspaper className="w-5 h-5 text-[#202020]" />
+                  <h2
+                    className="text-lg font-semibold text-[#202020]"
+                    style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                  >
+                    Financial News Feed
+                  </h2>
+                </div>
+              </div>
+
+              {/* News Items */}
+              <div className="space-y-3 mb-6">
+                {newsItems.map((item) => (
+                  <a
+                    key={item.id}
+                    href={item.url}
+                    className="block p-4 bg-[#f9fafb] hover:bg-[#f3f4f6] rounded-xl transition-colors"
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1">
+                        <h3
+                          className="text-[#202020] font-medium mb-2 line-clamp-2"
+                          style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                        >
+                          {item.title}
+                        </h3>
+                        <div className="flex items-center gap-2 text-sm text-[#6b7280]">
+                          <span>{item.source}</span>
+                          <span>•</span>
+                          <span>{item.time}</span>
+                        </div>
+                      </div>
+                      <Link2 className="w-4 h-4 text-[#6b7280] flex-shrink-0" />
+                    </div>
+                  </a>
+                ))}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center gap-3">
+                <button
+                  className="flex-1 px-6 py-3 bg-[#202020] hover:bg-[#404040] text-white rounded-xl transition-colors font-medium"
+                  style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                >
+                  Summaries
+                </button>
+                <button
+                  className="flex-1 px-6 py-3 bg-white border-2 border-[#202020] hover:bg-[#f9fafb] text-[#202020] rounded-xl transition-colors font-medium"
+                  style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                >
+                  The Whole Thing
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {activeSection === "Chat History" && (
           <div className="flex-1 flex flex-col bg-[#f9fafb] p-8">
             {/* Header */}
@@ -220,7 +432,7 @@ export default function UserSectionPage() {
                 className="flex items-center gap-2 px-4 py-2.5 bg-[#f3f4f6] hover:bg-[#e5e7eb] rounded-lg transition-colors"
                 style={{ fontFamily: "var(--font-figtree), Figtree" }}
               >
-                <Plus className="w-4 h-4 text-[#202020]" />
+                <Plus className="w-4 h-4" />
                 <span className="font-medium text-[#202020]">New Chat</span>
               </button>
             </div>
@@ -339,7 +551,7 @@ export default function UserSectionPage() {
                       onClick={handleSendMessage}
                       className="p-1.5 bg-[#9ca3af] hover:bg-[#6b7280] rounded-lg transition-colors"
                     >
-                      <ArrowUp className="w-5 h-5 text-white" />
+                      <Send className="w-5 h-5 text-white" />
                     </button>
                   </div>
                 </div>
@@ -401,7 +613,7 @@ export default function UserSectionPage() {
                       onClick={handleSendMessage}
                       className="p-1.5 bg-[#9ca3af] hover:bg-[#6b7280] rounded-lg transition-colors"
                     >
-                      <ArrowUp className="w-5 h-5 text-white" />
+                      <Send className="w-5 h-5 text-white" />
                     </button>
                   </div>
                 </div>
@@ -410,12 +622,438 @@ export default function UserSectionPage() {
           </>
         )}
 
-        {/* Placeholder for other sections */}
-        {activeSection !== "Ask Setu" && activeSection !== "Chat History" && (
-          <div className="flex-1 bg-black flex items-center justify-center">
-            <p className="text-white text-xl" style={{ fontFamily: "var(--font-figtree), Figtree" }}>
-              {activeSection} - Coming Soon
-            </p>
+        {/* Analysis Section */}
+        {activeSection === "Analysis" && (
+          <div className="flex-1 flex flex-col bg-[#f9fafb] p-8 gap-6 overflow-y-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Chat History with Setu Table */}
+              <div className="bg-white border border-[#e5e5e5] rounded-2xl p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h2
+                    className="text-xl font-semibold text-[#202020]"
+                    style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                  >
+                    Chat History with Setu
+                  </h2>
+                  <button
+                    className="text-sm text-[#3b82f6] hover:text-[#2563eb] font-medium transition-colors"
+                    style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                  >
+                    See All
+                  </button>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-[#e5e5e5]">
+                        <th
+                          className="text-left py-3 px-2 text-sm font-medium text-[#6b7280]"
+                          style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                        >
+                          #
+                        </th>
+                        <th
+                          className="text-left py-3 px-2 text-sm font-medium text-[#6b7280]"
+                          style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                        >
+                          Dates
+                        </th>
+                        <th
+                          className="text-left py-3 px-2 text-sm font-medium text-[#6b7280]"
+                          style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                        >
+                          Employee
+                        </th>
+                        <th
+                          className="text-left py-3 px-2 text-sm font-medium text-[#6b7280]"
+                          style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                        >
+                          Employeer
+                        </th>
+                        <th
+                          className="text-left py-3 px-2 text-sm font-medium text-[#6b7280]"
+                          style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                        >
+                          Amount
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[
+                        {
+                          id: 1,
+                          date: "Aug 28, 2013",
+                          employee: "Theresa Steward",
+                          employeer: "Pat Robertson",
+                          amount: "5000",
+                        },
+                        {
+                          id: 2,
+                          date: "July 7, 2014",
+                          employee: "Adrian Shavkat",
+                          employeer: "Norman Cooper",
+                          amount: "5850",
+                        },
+                        {
+                          id: 3,
+                          date: "May 2, 2015",
+                          employee: "Ralph Black",
+                          employeer: "Audrey Jones",
+                          amount: "5450",
+                        },
+                        {
+                          id: 4,
+                          date: "Feb 6, 2016",
+                          employee: "Eduardo Webb",
+                          employeer: "Audrey Jones",
+                          amount: "5700",
+                        },
+                      ].map((row) => (
+                        <tr key={row.id} className="border-b border-[#f3f4f6] hover:bg-[#f9fafb] transition-colors">
+                          <td
+                            className="py-3 px-2 text-sm text-[#6b7280]"
+                            style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                          >
+                            {row.id}
+                          </td>
+                          <td
+                            className="py-3 px-2 text-sm text-[#202020]"
+                            style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                          >
+                            {row.date}
+                          </td>
+                          <td
+                            className="py-3 px-2 text-sm text-[#202020]"
+                            style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                          >
+                            {row.employee}
+                          </td>
+                          <td
+                            className="py-3 px-2 text-sm text-[#202020]"
+                            style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                          >
+                            {row.employeer}
+                          </td>
+                          <td
+                            className="py-3 px-2 text-sm text-[#202020]"
+                            style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                          >
+                            {row.amount}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Financial Documents Table */}
+              <div className="bg-white border border-[#e5e5e5] rounded-2xl p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h2
+                    className="text-xl font-semibold text-[#202020]"
+                    style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                  >
+                    Financial Documents
+                  </h2>
+                  <button
+                    className="flex items-center gap-2 text-sm text-[#3b82f6] hover:text-[#2563eb] font-medium transition-colors"
+                    style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                  >
+                    <Upload className="w-4 h-4" />
+                    Upload
+                  </button>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-[#e5e5e5]">
+                        <th
+                          className="text-left py-3 px-2 text-sm font-medium text-[#6b7280]"
+                          style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                        >
+                          #
+                        </th>
+                        <th
+                          className="text-left py-3 px-2 text-sm font-medium text-[#6b7280]"
+                          style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                        >
+                          Title
+                        </th>
+                        <th
+                          className="text-left py-3 px-2 text-sm font-medium text-[#6b7280]"
+                          style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                        >
+                          Date
+                        </th>
+                        <th
+                          className="text-left py-3 px-2 text-sm font-medium text-[#6b7280]"
+                          style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                        >
+                          Type
+                        </th>
+                        <th
+                          className="text-left py-3 px-2 text-sm font-medium text-[#6b7280]"
+                          style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                        >
+                          Download
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[
+                        { id: 1, title: "Passport Scan", date: "2023-01-01" },
+                        { id: 2, title: "Income Statement", date: "2023-02-01" },
+                        { id: 3, title: "Bank Statement", date: "2023-03-01" },
+                      ].map((row) => (
+                        <tr key={row.id} className="border-b border-[#f3f4f6] hover:bg-[#f9fafb] transition-colors">
+                          <td
+                            className="py-3 px-2 text-sm text-[#6b7280]"
+                            style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                          >
+                            {row.id}
+                          </td>
+                          <td
+                            className="py-3 px-2 text-sm text-[#202020]"
+                            style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                          >
+                            {row.title}
+                          </td>
+                          <td
+                            className="py-3 px-2 text-sm text-[#202020]"
+                            style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                          >
+                            {row.date}
+                          </td>
+                          <td
+                            className="py-3 px-2 text-sm text-[#202020]"
+                            style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                          >
+                            Document
+                          </td>
+                          <td
+                            className="py-3 px-2 text-sm text-[#202020]"
+                            style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                          >
+                            <button className="p-1 hover:bg-[#f3f4f6] rounded transition-colors">
+                              <Download className="w-4 h-4 text-[#6b7280]" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Risk Indicators Widget */}
+              <div className="bg-white border border-[#e5e5e5] rounded-2xl p-6">
+                <h2
+                  className="text-xl font-semibold text-[#202020] mb-6"
+                  style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                >
+                  Risk Indicators
+                </h2>
+
+                <div className="space-y-4">
+                  {[
+                    { label: "Credit Risk", value: 35, color: "bg-green-500" },
+                    { label: "Market Risk", value: 68, color: "bg-yellow-500" },
+                    { label: "Liquidity Risk", value: 82, color: "bg-red-500" },
+                    { label: "Operational Risk", value: 45, color: "bg-blue-500" },
+                  ].map((risk, index) => (
+                    <div key={index}>
+                      <div className="flex justify-between items-center mb-2">
+                        <span
+                          className="text-sm font-medium text-[#202020]"
+                          style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                        >
+                          {risk.label}
+                        </span>
+                        <span
+                          className="text-sm font-semibold text-[#202020]"
+                          style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                        >
+                          {risk.value}%
+                        </span>
+                      </div>
+                      <div className="w-full bg-[#f3f4f6] rounded-full h-2.5">
+                        <div
+                          className={`${risk.color} h-2.5 rounded-full transition-all duration-300`}
+                          style={{ width: `${risk.value}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Calendar Widget */}
+              <div className="bg-white border border-[#e5e5e5] rounded-2xl p-6">
+                <h2
+                  className="text-xl font-semibold text-[#202020] mb-6"
+                  style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                >
+                  Calendar
+                </h2>
+
+                <div className="space-y-4">
+                  {/* Month & Year Header */}
+                  <div className="flex items-center justify-between mb-4">
+                    <button className="p-2 hover:bg-[#f3f4f6] rounded-lg transition-colors">
+                      <ChevronLeft className="w-5 h-5 text-[#6b7280]" />
+                    </button>
+                    <span
+                      className="text-lg font-semibold text-[#202020]"
+                      style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                    >
+                      November 2025
+                    </span>
+                    <button className="p-2 hover:bg-[#f3f4f6] rounded-lg transition-colors">
+                      <ChevronRight className="w-5 h-5 text-[#6b7280]" />
+                    </button>
+                  </div>
+
+                  {/* Days of Week */}
+                  <div className="grid grid-cols-7 gap-2 text-center">
+                    {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => (
+                      <div
+                        key={day}
+                        className="text-xs font-medium text-[#6b7280] py-2"
+                        style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                      >
+                        {day}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Calendar Days */}
+                  <div className="grid grid-cols-7 gap-2 text-center">
+                    {Array.from({ length: 35 }, (_, i) => {
+                      const day = i - 2
+                      const isToday = day === 28
+                      const isInMonth = day > 0 && day <= 30
+                      return (
+                        <button
+                          key={i}
+                          className={`py-2 text-sm rounded-lg transition-colors ${
+                            isToday
+                              ? "bg-[#202020] text-white font-semibold"
+                              : isInMonth
+                                ? "hover:bg-[#f3f4f6] text-[#202020]"
+                                : "text-[#d1d5db]"
+                          }`}
+                          style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                        >
+                          {isInMonth ? day : ""}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {/* Financial Overview Widget */}
+              <div className="bg-white border border-[#e5e5e5] rounded-2xl p-6">
+                <h2
+                  className="text-xl font-semibold text-[#202020] mb-6"
+                  style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                >
+                  Financial Overview
+                </h2>
+
+                <div className="space-y-6">
+                  {[
+                    {
+                      label: "Income",
+                      amount: "₹85,000",
+                      icon: TrendingUp,
+                      color: "text-green-500",
+                      bgColor: "bg-green-50",
+                    },
+                    {
+                      label: "Expenses",
+                      amount: "₹52,000",
+                      icon: TrendingDown,
+                      color: "text-red-500",
+                      bgColor: "bg-red-50",
+                    },
+                    {
+                      label: "Savings",
+                      amount: "₹33,000",
+                      icon: Wallet,
+                      color: "text-blue-500",
+                      bgColor: "bg-blue-50",
+                    },
+                  ].map((item, index) => {
+                    const Icon = item.icon
+                    return (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-4 bg-[#f9fafb] rounded-xl hover:bg-[#f3f4f6] transition-colors"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className={`${item.bgColor} p-3 rounded-xl`}>
+                            <Icon className={`w-5 h-5 ${item.color}`} />
+                          </div>
+                          <span
+                            className="text-sm font-medium text-[#6b7280]"
+                            style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                          >
+                            {item.label}
+                          </span>
+                        </div>
+                        <span
+                          className="text-lg font-semibold text-[#202020]"
+                          style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                        >
+                          {item.amount}
+                        </span>
+                      </div>
+                    )
+                  })}
+
+                  <div className="pt-4 border-t border-[#e5e5e5]">
+                    <div className="flex justify-between items-center">
+                      <span
+                        className="text-sm font-medium text-[#6b7280]"
+                        style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                      >
+                        Net Balance
+                      </span>
+                      <span
+                        className="text-xl font-bold text-green-500"
+                        style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                      >
+                        ₹33,000
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Financial Summaries Section */}
+        {activeSection === "Financial Summaries" && (
+          <div className="flex-1 flex flex-col bg-[#f9fafb] p-8 gap-6 overflow-y-auto">
+            {/* Placeholder for Financial Summaries */}
+            <div className="bg-white border border-[#e5e5e5] rounded-2xl p-6">
+              <h2
+                className="text-xl font-semibold text-[#202020] mb-6"
+                style={{ fontFamily: "var(--font-figtree), Figtree" }}
+              >
+                Financial Summaries
+              </h2>
+              <p className="text-[#6b7280] mb-6" style={{ fontFamily: "var(--font-figtree), Figtree" }}>
+                Placeholder for Financial Summaries content.
+              </p>
+            </div>
           </div>
         )}
       </main>
