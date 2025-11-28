@@ -32,7 +32,7 @@ const caseStudies: CaseStudy[] = [
     ),
     title: "Setu asks you about your financial personality to understand you better as your financial friend",
     features: ["Ask Setu", "Personal Finance", "Financial Summaries"],
-    quote: "Auralink gives us clarity on team alignment we never had before.",
+    quote: "Finance SETU gives us clarity on team alignment we never had before.",
     attribution: "Marie Chen, Head of Operations, Clandestine",
     accentColor: "#16b364",
     cards: [
@@ -128,7 +128,7 @@ const caseStudies: CaseStudy[] = [
     ),
     title: "Conversations with Setu get converted into detailed financial reports",
     features: ["Ask Setu", "Personal Finance", "Financial Summaries"],
-    quote: "With Auralink, we can see collaboration patterns that directly impact our product velocity.",
+    quote: "With Finance SETU, we can see collaboration patterns that directly impact our product velocity.",
     attribution: "Sarah Chen, VP Engineering, Cloudwatch",
     accentColor: "#3b82f6",
     cards: [
@@ -154,7 +154,7 @@ const caseStudies: CaseStudy[] = [
     ),
     title: "Setu not only tells you about your finances but teaches you about everything too",
     features: ["Ask Setu", "Financial Summaries"],
-    quote: "Auralink transformed how we understand our remote-first culture.",
+    quote: "Finance SETU transformed how we understand our remote-first culture.",
     attribution: "Karri Saarinen, Co-founder, EightBall",
     accentColor: "#0A0D12",
     cards: [
@@ -554,7 +554,7 @@ export const CaseStudiesCarousel = () => {
                   >
                     "{currentStudy.quote}"
                   </p>
-                  
+                  <cite className="text-sm text-muted-foreground">{currentStudy.attribution}</cite>
                 </blockquote>
               </motion.div>
             </AnimatePresence>

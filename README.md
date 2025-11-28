@@ -1,30 +1,29 @@
-# Auralink - SaaS Landing Page
+# Finance SETU
 
-*Automatically synced with your [v0.app](https://v0.app) deployments*
+Finance SETU is your personal financial guide that simplifies complex money matters in India. We help you navigate everything from loan applications and EMI management to investment taxes and startup filings.
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/setumain21-2365s-projects/v0-auralink-saa-s-landing-page)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.app-black?style=for-the-badge)](https://v0.app/chat/3AqFG6wnnL7)
+## Features
 
-## Overview
+- **Personal Finance Guidance**: Get clear explanations for complex financial decisions
+- **Loan & EMI Management**: Understand and manage your loans and EMIs effectively
+- **Investment Tax Support**: Navigate investment taxes with confidence
+- **Startup Filing Assistance**: Simplified startup registration and compliance
+- **Financial Education**: Learn while you manage your finances
 
-This repository will stay in sync with your deployed chats on [v0.app](https://v0.app).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.app](https://v0.app).
+## Getting Started
 
-## Deployment
+First, run the development server:
 
-Your project is live at:
+\`\`\`bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+\`\`\`
 
-**[https://vercel.com/setumain21-2365s-projects/v0-auralink-saa-s-landing-page](https://vercel.com/setumain21-2365s-projects/v0-auralink-saa-s-landing-page)**
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## Build your app
+## About
 
-Continue building your app on:
-
-**[https://v0.app/chat/3AqFG6wnnL7](https://v0.app/chat/3AqFG6wnnL7)**
-
-## How It Works
-
-1. Create and modify your project using [v0.app](https://v0.app)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+Finance SETU bridges the gap between you and financial clarity, breaking down confusing jargon into clear, actionable steps you can understand and control.

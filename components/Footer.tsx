@@ -76,7 +76,7 @@ export const Footer = ({
     twitter: "https://twitter.com",
     linkedin: "https://linkedin.com",
     github: "https://github.com",
-    email: "hello@auralink.com",
+    email: "hello@financesetu.com", // Updated email to Finance SETU domain
   },
   copyrightText,
 }: FooterProps) => {

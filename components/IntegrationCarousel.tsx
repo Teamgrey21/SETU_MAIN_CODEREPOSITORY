@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useRef } from "react"
-import { motion } from "framer-motion"
 type IntegrationApp = {
   name: string
   logo: string
@@ -17,101 +16,101 @@ type IntegrationCarouselProps = {
 const defaultTopRowApps: IntegrationApp[] = [
   {
     name: "Integration 1",
-    logo: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logoipsum-389-Hc8XBOUI8vkVmIwWQZs33kxMF353Xj.png",
+    logo: "/images/logoipsum-389.png",
   },
   {
     name: "Integration 2",
-    logo: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logoipsum-407-eyikTTM6ccO0f4I7ZmNk5LpFI4EKOG.png",
+    logo: "/images/logoipsum-407.png",
   },
   {
     name: "Integration 3",
-    logo: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logoipsum-379-5hDaxwIw4LzjwXzWuorEXi7ESrGYl1.png",
+    logo: "/images/logoipsum-379.png",
   },
   {
     name: "Integration 4",
-    logo: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logoipsum-374-bp0RaoVnQI1JMqR9fjessWI8v33kLV.png",
+    logo: "/images/logoipsum-374.png",
   },
   {
     name: "Integration 5",
-    logo: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logoipsum-381-eKw7vkCp2Wq9hivZJaN1ERJdjCqR0d.png",
+    logo: "/images/logoipsum-381.png",
   },
   {
     name: "Integration 6",
-    logo: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logoipsum-401-F6mjMLGEZt4HAohKA889Z8Gf5fMzIw.png",
+    logo: "/images/logoipsum-401.png",
   },
   {
     name: "Integration 7",
-    logo: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logoipsum-403-HnBAGFYWgxxMGrH2PI45UorQOsQHFo.png",
+    logo: "/images/logoipsum-403.png",
   },
   {
     name: "Integration 1",
-    logo: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logoipsum-389-Hc8XBOUI8vkVmIwWQZs33kxMF353Xj.png",
+    logo: "/images/logoipsum-389.png",
   },
   {
     name: "Integration 2",
-    logo: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logoipsum-407-eyikTTM6ccO0f4I7ZmNk5LpFI4EKOG.png",
+    logo: "/images/logoipsum-407.png",
   },
   {
     name: "Integration 3",
-    logo: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logoipsum-379-5hDaxwIw4LzjwXzWuorEXi7ESrGYl1.png",
+    logo: "/images/logoipsum-379.png",
   },
   {
     name: "Integration 4",
-    logo: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logoipsum-374-bp0RaoVnQI1JMqR9fjessWI8v33kLV.png",
+    logo: "/images/logoipsum-374.png",
   },
   {
     name: "Integration 5",
-    logo: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logoipsum-381-eKw7vkCp2Wq9hivZJaN1ERJdjCqR0d.png",
+    logo: "/images/logoipsum-381.png",
   },
 ]
 const defaultBottomRowApps: IntegrationApp[] = [
   {
     name: "Integration 6",
-    logo: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logoipsum-401-F6mjMLGEZt4HAohKA889Z8Gf5fMzIw.png",
+    logo: "/images/logoipsum-401.png",
   },
   {
     name: "Integration 7",
-    logo: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logoipsum-403-HnBAGFYWgxxMGrH2PI45UorQOsQHFo.png",
+    logo: "/images/logoipsum-403.png",
   },
   {
     name: "Integration 1",
-    logo: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logoipsum-389-Hc8XBOUI8vkVmIwWQZs33kxMF353Xj.png",
+    logo: "/images/logoipsum-389.png",
   },
   {
     name: "Integration 2",
-    logo: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logoipsum-407-eyikTTM6ccO0f4I7ZmNk5LpFI4EKOG.png",
+    logo: "/images/logoipsum-407.png",
   },
   {
     name: "Integration 3",
-    logo: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logoipsum-379-5hDaxwIw4LzjwXzWuorEXi7ESrGYl1.png",
+    logo: "/images/logoipsum-379.png",
   },
   {
     name: "Integration 4",
-    logo: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logoipsum-374-bp0RaoVnQI1JMqR9fjessWI8v33kLV.png",
+    logo: "/images/logoipsum-374.png",
   },
   {
     name: "Integration 5",
-    logo: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logoipsum-381-eKw7vkCp2Wq9hivZJaN1ERJdjCqR0d.png",
+    logo: "/images/logoipsum-381.png",
   },
   {
     name: "Integration 6",
-    logo: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logoipsum-401-F6mjMLGEZt4HAohKA889Z8Gf5fMzIw.png",
+    logo: "/images/logoipsum-401.png",
   },
   {
     name: "Integration 7",
-    logo: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logoipsum-403-HnBAGFYWgxxMGrH2PI45UorQOsQHFo.png",
+    logo: "/images/logoipsum-403.png",
   },
   {
     name: "Integration 1",
-    logo: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logoipsum-389-Hc8XBOUI8vkVmIwWQZs33kxMF353Xj.png",
+    logo: "/images/logoipsum-389.png",
   },
   {
     name: "Integration 2",
-    logo: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logoipsum-407-eyikTTM6ccO0f4I7ZmNk5LpFI4EKOG.png",
+    logo: "/images/logoipsum-407.png",
   },
   {
     name: "Integration 3",
-    logo: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logoipsum-379-5hDaxwIw4LzjwXzWuorEXi7ESrGYl1.png",
+    logo: "/images/logoipsum-379.png",
   },
 ]
 
@@ -120,7 +119,7 @@ export const IntegrationCarousel = ({
   buttonText = "Explore Integrations",
   buttonHref = "#",
   title = "Integrates with your entire collaboration stack.",
-  subtitle = "Connect Auralink to Slack, Zoom, Notion, Google Meet, and dozens of others to analyze communication seamlessly.",
+  subtitle = "Connect Finance SETU to Slack, Zoom, Notion, Google Meet, and dozens of others to analyze communication seamlessly.",
   topRowApps = defaultTopRowApps,
   bottomRowApps = defaultBottomRowApps,
 }: IntegrationCarouselProps) => {
@@ -160,7 +159,5 @@ export const IntegrationCarousel = ({
   }, [])
 
   // @return
-  return (
-    null
-  )
+  return null
 }

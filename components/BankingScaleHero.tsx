@@ -34,7 +34,7 @@ const stats: StatItem[] = [
   },
   {
     value: "1000+",
-    description: "Organizations using\nAuralink",
+    description: "Organizations using\nFinance SETU",
     delay: 0.6,
   },
 ]
@@ -146,7 +146,7 @@ export const BankingScaleHero = () => {
                 fontFamily: "var(--font-figtree), Figtree",
               }}
             >
-              with setu we aim to solve the core financial problems faced by the&nbsp;people&nbsp;of&nbsp;India 
+              with setu we aim to solve the core financial problems faced by the&nbsp;people&nbsp;of&nbsp;India
             </p>
 
             <button className="relative inline-flex justify-center items-center leading-4 text-center cursor-pointer whitespace-nowrap outline-none font-medium h-9 text-[#232730] bg-white/50 backdrop-blur-sm shadow-[0_1px_1px_0_rgba(255,255,255,0),0_0_0_1px_rgba(87,90,100,0.12)] transition-all duration-200 ease-in-out rounded-lg px-4 mt-5 text-sm group hover:shadow-[0_1px_2px_0_rgba(0,0,0,0.05),0_0_0_1px_rgba(87,90,100,0.18)]">
@@ -184,7 +184,9 @@ export const BankingScaleHero = () => {
                       }}
                       className="flex flex-col gap-2"
                     >
-                      
+                      <p className="text-3xl font-bold leading-[1.2] text-[#111A4A] m-0 whitespace-pre-line">
+                        {stat.value}
+                      </p>
                       <p className="text-xs leading-[13.2px] text-[#7C7F88] m-0 whitespace-pre-line">
                         {stat.description}
                       </p>

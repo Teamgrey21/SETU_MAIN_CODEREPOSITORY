@@ -1,55 +1,127 @@
 "use client"
 
+import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { motion } from "framer-motion"
+import {
+  Home,
+  BarChart3,
+  MessageSquare,
+  FileText,
+  Clock,
+  Settings,
+  HelpCircle,
+  Github,
+  Mail,
+  ChevronLeft,
+} from "lucide-react"
 
 export default function UserSectionPage() {
   const router = useRouter()
+  const [activeSection, setActiveSection] = useState("Home")
+
+  const menuItems = [
+    { name: "Home", icon: Home },
+    { name: "Analysis", icon: BarChart3 },
+    { name: "Ask Setu", icon: MessageSquare },
+    { name: "Financial Reports", icon: FileText },
+    { name: "Chat History", icon: Clock },
+  ]
+
+  const bottomMenuItems = [
+    { name: "Settings", icon: Settings },
+    { name: "Help Center", icon: HelpCircle },
+  ]
 
   return (
-    <div className="min-h-screen w-full relative overflow-hidden bg-gradient-to-br from-[#4A9FD8] via-[#5BA8DC] to-[#3D8FC9]">
-      {/* Grid Pattern Background */}
-      <div
-        className="absolute inset-0 opacity-30"
-        style={{
-          backgroundImage: `
-            linear-gradient(to right, rgba(255,255,255,0.1) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(255,255,255,0.1) 1px, transparent 1px)
-          `,
-          backgroundSize: "80px 80px",
-        }}
-      />
+    <div className="min-h-screen w-full bg-black flex">
+      {/* Sidebar */}
+      <aside className="w-80 bg-white border-r border-[#e5e5e5] flex flex-col">
+        {/* Header */}
+        <div className="p-6 border-b border-[#e5e5e5] flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            {/* Logo */}
+            <div className="w-10 h-10 bg-[#202020] rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-lg">FS</span>
+            </div>
+            <div className="flex flex-col">
+              <h2
+                className="text-[#202020] font-semibold text-lg"
+                style={{ fontFamily: "var(--font-figtree), Figtree" }}
+              >
+                Finance Setu
+              </h2>
+              <p className="text-[#6b7280] text-xs" style={{ fontFamily: "var(--font-figtree), Figtree" }}>
+                mail.financesetu@gmail.com
+              </p>
+            </div>
+          </div>
+          <button className="p-1 hover:bg-[#f3f4f6] rounded-md transition-colors">
+            <ChevronLeft className="w-5 h-5 text-[#6b7280]" />
+          </button>
+        </div>
 
-      <div className="relative z-10 min-h-screen flex items-center justify-center p-8">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-          className="bg-white/95 backdrop-blur-sm rounded-3xl p-12 shadow-2xl max-w-2xl w-full text-center"
-        >
-          <h1 className="text-5xl font-bold text-[#202020] mb-4" style={{ fontFamily: "var(--font-figtree), Figtree" }}>
-            Welcome to Finance Setu!
-          </h1>
-          <p className="text-xl text-[#404040] mb-8" style={{ fontFamily: "var(--font-figtree), Figtree" }}>
-            Your financial journey starts here
-          </p>
+        {/* Main Navigation */}
+        <nav className="flex-1 p-4">
+          <div className="space-y-1">
+            {menuItems.map((item) => {
+              const Icon = item.icon
+              const isActive = activeSection === item.name
+              return (
+                <button
+                  key={item.name}
+                  onClick={() => setActiveSection(item.name)}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                    isActive ? "bg-[#f3f4f6] text-[#202020]" : "text-[#6b7280] hover:bg-[#f9fafb]"
+                  }`}
+                  style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                >
+                  <Icon className="w-5 h-5" />
+                  <span className="font-medium">{item.name}</span>
+                </button>
+              )
+            })}
+          </div>
+        </nav>
 
-          {/* Placeholder for future content */}
-          <div className="py-12 text-[#606060]">
-            <p style={{ fontFamily: "var(--font-figtree), Figtree" }}>
-              This is your user section. More features coming soon...
-            </p>
+        {/* Bottom Section */}
+        <div className="p-4 border-t border-[#e5e5e5]">
+          {/* Social Icons */}
+          <div className="flex items-center gap-3 mb-4 px-4">
+            <a
+              href="https://github.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 hover:bg-[#f3f4f6] rounded-md transition-colors"
+            >
+              <Github className="w-5 h-5 text-[#6b7280]" />
+            </a>
+            <a href="mailto:mail.financesetu@gmail.com" className="p-2 hover:bg-[#f3f4f6] rounded-md transition-colors">
+              <Mail className="w-5 h-5 text-[#6b7280]" />
+            </a>
           </div>
 
-          <button
-            onClick={() => router.push("/")}
-            className="px-8 py-4 bg-[#4A9FD8] text-white rounded-2xl font-medium hover:bg-[#3D8FC9] transition-all shadow-lg"
-            style={{ fontFamily: "var(--font-figtree), Figtree" }}
-          >
-            Back to Home
-          </button>
-        </motion.div>
-      </div>
+          {/* Bottom Menu Items */}
+          <div className="space-y-1">
+            {bottomMenuItems.map((item) => {
+              const Icon = item.icon
+              return (
+                <button
+                  key={item.name}
+                  onClick={() => setActiveSection(item.name)}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-[#6b7280] hover:bg-[#f9fafb] transition-all"
+                  style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                >
+                  <Icon className="w-5 h-5" />
+                  <span className="font-medium">{item.name}</span>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      </aside>
+
+      {/* Main Content Area - Black for now */}
+      <main className="flex-1 bg-black">{/* Content will be added here */}</main>
     </div>
   )
 }
