@@ -23,7 +23,7 @@ const navigationLinks = [
 ] as any[]
 
 // @component: PortfolioNavbar
-export const PortfolioNavbar = () => {
+const PortfolioNavbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   useEffect(() => {
@@ -75,9 +75,7 @@ export const PortfolioNavbar = () => {
             </button>
           </div>
 
-          <div className="hidden md:block">
-            
-          </div>
+          <div className="hidden md:block"></div>
 
           <div className="hidden md:block">
             <button
@@ -93,7 +91,7 @@ export const PortfolioNavbar = () => {
                   fontWeight: "500",
                 }}
               >
-                {"GET SETU"}  
+                {"GET SETU"}
               </span>
             </button>
           </div>
@@ -163,3 +161,5 @@ export const PortfolioNavbar = () => {
     </nav>
   )
 }
+
+export default PortfolioNavbar

@@ -1,13 +1,18 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { User, ArrowRight, ArrowLeft } from "lucide-react"
 import { motion } from "framer-motion"
+import { createClient } from "@/lib/supabase/client"
 
 export default function OnboardingPage() {
   const router = useRouter()
   const [step, setStep] = useState(1)
+  const [isLoading, setIsLoading] = useState(false)
+  const [userEmail, setUserEmail] = useState("")
+  const [userId, setUserId] = useState("")
+
   const [formData, setFormData] = useState({
     name: "",
     age: "",
@@ -28,6 +33,28 @@ export default function OnboardingPage() {
     lifePlanningApproach: "",
     likedOnboarding: "",
   })
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const supabase = createClient()
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser()
+
+      if (error || !user) {
+        console.log("[v0] No authenticated user, redirecting to home")
+        router.push("/")
+        return
+      }
+
+      console.log("[v0] Authenticated user:", user.email)
+      setUserEmail(user.email || "")
+      setUserId(user.id)
+    }
+
+    checkAuth()
+  }, [router])
 
   const steps = [
     { number: 1, label: "Personal Info" },
@@ -66,16 +93,59 @@ export default function OnboardingPage() {
     if (step > 1) setStep(step - 1)
   }
 
-  const handleComplete = () => {
-    console.log("Onboarding completed with data:", formData)
-    router.push("/user-section")
+  const handleComplete = async () => {
+    setIsLoading(true)
+
+    try {
+      const supabase = createClient()
+
+      const onboardingData = {
+        user_id: userId,
+        email: userEmail,
+        name: formData.name,
+        age: formData.age ? Number.parseInt(formData.age) : null,
+        occupation: formData.occupation,
+        income_per_month: formData.totalIncome ? Number.parseFloat(formData.totalIncome) : null,
+        expenses_per_month: formData.totalExpenses ? Number.parseFloat(formData.totalExpenses) : null,
+        savings_per_month: formData.savings ? Number.parseFloat(formData.savings) : null,
+        major_assets: formData.majorAsset,
+        assets_value: formData.assetValue ? Number.parseFloat(formData.assetValue) : null,
+        invest_money_in_yourself: formData.selfInvestment,
+        send_money_to_parents_or_education: formData.sendMoneyToFamily === "Yes",
+        have_done_investing: formData.hasInvestedBefore === "Yes",
+        investment_types: formData.investmentTypes.join(", "),
+        long_term_goals: formData.longTermGoal,
+        long_term_goals_value: formData.longTermAmount ? Number.parseFloat(formData.longTermAmount) : null,
+        short_term_goals: formData.shortTermGoal,
+        short_term_goals_value: formData.shortTermAmount ? Number.parseFloat(formData.shortTermAmount) : null,
+        approach_to_life_planning: formData.lifePlanningApproach,
+        liked_onboarding_process: formData.likedOnboarding === "Yes",
+      }
+
+      console.log("[v0] Saving onboarding data:", onboardingData)
+
+      const { error } = await supabase.from("user_onboarding_information").insert(onboardingData)
+
+      if (error) {
+        console.error("[v0] Error saving onboarding data:", error)
+        throw error
+      }
+
+      console.log("[v0] Onboarding data saved successfully")
+
+      router.push("/user-section")
+    } catch (error) {
+      console.error("[v0] Error during onboarding completion:", error)
+      alert("There was an error saving your information. Please try again.")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const profileCompletion = step === 1 ? 0 : step === 2 ? 27 : step === 3 ? 66 : 100
 
   return (
     <div className="min-h-screen w-full relative overflow-hidden bg-gradient-to-br from-[#4A9FD8] via-[#5BA8DC] to-[#3D8FC9]">
-      {/* Grid Pattern Background */}
       <div
         className="absolute inset-0 opacity-30"
         style={{
@@ -88,9 +158,7 @@ export default function OnboardingPage() {
       />
 
       <div className="relative z-10 min-h-screen flex">
-        {/* Left Sidebar */}
         <div className="w-64 p-8 flex flex-col gap-8">
-          {/* Profile Completion Card */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -105,7 +173,6 @@ export default function OnboardingPage() {
             <p className="text-sm text-[#606060] mt-2">Profile completion</p>
           </motion.div>
 
-          {/* Steps Navigation */}
           <div>
             <h3 className="text-white/80 text-sm font-medium mb-4 tracking-wide">ACCOUNT SETUP</h3>
             <div className="space-y-2">
@@ -134,7 +201,6 @@ export default function OnboardingPage() {
           </div>
         </div>
 
-        {/* Main Content */}
         <div className="flex-1 p-12 flex flex-col items-center justify-between">
           <motion.div
             key={step}
@@ -145,7 +211,6 @@ export default function OnboardingPage() {
           >
             {step === 1 && (
               <>
-                {/* Header */}
                 <div className="text-center mb-12">
                   <h1
                     className="text-5xl font-bold text-white mb-3"
@@ -158,9 +223,7 @@ export default function OnboardingPage() {
                   </p>
                 </div>
 
-                {/* Form Cards */}
                 <div className="grid grid-cols-2 gap-6 mb-6">
-                  {/* Name Input - White Card */}
                   <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -183,7 +246,6 @@ export default function OnboardingPage() {
                     />
                   </motion.div>
 
-                  {/* Age Input - Black Card */}
                   <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -207,7 +269,6 @@ export default function OnboardingPage() {
                   </motion.div>
                 </div>
 
-                {/* Occupation Selection - White Card */}
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -242,7 +303,6 @@ export default function OnboardingPage() {
 
             {step === 2 && (
               <>
-                {/* Header */}
                 <div className="text-center mb-12">
                   <h1
                     className="text-5xl font-bold text-white mb-3"
@@ -255,9 +315,7 @@ export default function OnboardingPage() {
                   </p>
                 </div>
 
-                {/* Form Cards */}
                 <div className="grid grid-cols-2 gap-6 mb-6">
-                  {/* Total Income - White Card */}
                   <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -284,7 +342,6 @@ export default function OnboardingPage() {
                     </div>
                   </motion.div>
 
-                  {/* Total Expenses - Black Card */}
                   <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -311,7 +368,6 @@ export default function OnboardingPage() {
                     </div>
                   </motion.div>
 
-                  {/* Savings - White Card */}
                   <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -338,7 +394,6 @@ export default function OnboardingPage() {
                     </div>
                   </motion.div>
 
-                  {/* Any Major Assets - Black Card */}
                   <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -374,7 +429,6 @@ export default function OnboardingPage() {
                   </motion.div>
                 </div>
 
-                {/* Info Note */}
                 <motion.p
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -385,7 +439,6 @@ export default function OnboardingPage() {
                   *you could write your Saving, Emergency Funds, Stock's and Agriculture land as assets too
                 </motion.p>
 
-                {/* Self Investment Question Card */}
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -423,7 +476,6 @@ export default function OnboardingPage() {
 
             {step === 3 && (
               <>
-                {/* Header */}
                 <div className="text-center mb-12">
                   <h1
                     className="text-5xl font-bold text-white mb-3"
@@ -436,9 +488,7 @@ export default function OnboardingPage() {
                   </p>
                 </div>
 
-                {/* Question Cards Grid */}
                 <div className="grid grid-cols-2 gap-6 mb-6">
-                  {/* Send Money Question - White Card */}
                   <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -469,7 +519,6 @@ export default function OnboardingPage() {
                     </div>
                   </motion.div>
 
-                  {/* Investing Question - Black Card */}
                   <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -501,7 +550,6 @@ export default function OnboardingPage() {
                   </motion.div>
                 </div>
 
-                {/* Investment Types - Black Card */}
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -533,7 +581,6 @@ export default function OnboardingPage() {
                   </div>
                 </motion.div>
 
-                {/* Your Financial Goals - White Card */}
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -547,7 +594,6 @@ export default function OnboardingPage() {
                     Your Financial Goals
                   </h3>
                   <div className="grid grid-cols-2 gap-8">
-                    {/* Long-term Goal */}
                     <div>
                       <label className="block text-sm font-medium text-[#606060] uppercase tracking-wide mb-3">
                         LONG-TERM GOAL
@@ -573,7 +619,6 @@ export default function OnboardingPage() {
                       </div>
                     </div>
 
-                    {/* Short-term Goal */}
                     <div>
                       <label className="block text-sm font-medium text-[#606060] uppercase tracking-wide mb-3">
                         SHORT-TERM GOAL
@@ -601,7 +646,6 @@ export default function OnboardingPage() {
                   </div>
                 </motion.div>
 
-                {/* Life Planning Approach Question - Black Card */}
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -624,7 +668,6 @@ export default function OnboardingPage() {
                   />
                 </motion.div>
 
-                {/* Onboarding Feedback Question - White Card */}
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -662,7 +705,6 @@ export default function OnboardingPage() {
               <div className="text-center">
                 <h1 className="text-5xl font-bold text-white mb-3">Get Started with Setu</h1>
                 <p className="text-xl text-white/80 mb-6">Let's work together on your Finances. Let's Begin</p>
-                {/* Additional content or actions can be added here */}
               </div>
             )}
           </motion.div>
@@ -673,11 +715,11 @@ export default function OnboardingPage() {
             transition={{ delay: 0.4 }}
             className="w-full max-w-4xl flex items-center justify-between mt-8"
           >
-            {/* Previous Button */}
             {step > 1 && (
               <button
                 onClick={handlePrevious}
-                className="flex items-center gap-2 px-8 py-4 bg-white/95 backdrop-blur-sm rounded-2xl text-[#202020] font-medium hover:bg-white transition-all shadow-lg"
+                disabled={isLoading}
+                className="flex items-center gap-2 px-8 py-4 bg-white/95 backdrop-blur-sm rounded-2xl text-[#202020] font-medium hover:bg-white transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ fontFamily: "var(--font-figtree), Figtree" }}
               >
                 <ArrowLeft className="w-5 h-5" />
@@ -686,11 +728,11 @@ export default function OnboardingPage() {
             )}
             {step === 1 && <div />}
 
-            {/* Next/Complete Button */}
             {step < 4 ? (
               <button
                 onClick={handleNext}
-                className="flex items-center gap-2 px-8 py-4 bg-[#334155] backdrop-blur-sm rounded-2xl text-white font-medium hover:bg-[#475569] transition-all shadow-lg ml-auto"
+                disabled={isLoading}
+                className="flex items-center gap-2 px-8 py-4 bg-[#334155] backdrop-blur-sm rounded-2xl text-white font-medium hover:bg-[#475569] transition-all shadow-lg ml-auto disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ fontFamily: "var(--font-figtree), Figtree" }}
               >
                 Next
@@ -699,10 +741,11 @@ export default function OnboardingPage() {
             ) : (
               <button
                 onClick={handleComplete}
-                className="flex items-center gap-2 px-8 py-4 bg-[#334155] backdrop-blur-sm rounded-2xl text-white font-medium hover:bg-[#475569] transition-all shadow-lg ml-auto"
+                disabled={isLoading}
+                className="flex items-center gap-2 px-8 py-4 bg-[#334155] backdrop-blur-sm rounded-2xl text-white font-medium hover:bg-[#475569] transition-all shadow-lg ml-auto disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ fontFamily: "var(--font-figtree), Figtree" }}
               >
-                Complete
+                {isLoading ? "Saving..." : "Complete"}
                 <ArrowRight className="w-5 h-5" />
               </button>
             )}

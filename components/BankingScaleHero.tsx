@@ -59,7 +59,7 @@ const generateDataPoints = (): DataPoint[] => {
 }
 
 // @component: BankingScaleHero
-export const BankingScaleHero = () => {
+const BankingScaleHero = () => {
   const [isVisible, setIsVisible] = useState(false)
   const [dataPoints] = useState<DataPoint[]>(generateDataPoints())
   const [typingComplete, setTypingComplete] = useState(false)
@@ -184,9 +184,6 @@ export const BankingScaleHero = () => {
                       }}
                       className="flex flex-col gap-2"
                     >
-                      <p className="text-3xl font-bold leading-[1.2] text-[#111A4A] m-0 whitespace-pre-line">
-                        {stat.value}
-                      </p>
                       <p className="text-xs leading-[13.2px] text-[#7C7F88] m-0 whitespace-pre-line">
                         {stat.description}
                       </p>
@@ -201,3 +198,6 @@ export const BankingScaleHero = () => {
     </div>
   )
 }
+
+export { BankingScaleHero }
+export default BankingScaleHero

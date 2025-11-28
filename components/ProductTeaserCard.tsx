@@ -16,7 +16,7 @@ type ProductTeaserCardProps = {
 }
 
 // @component: ProductTeaserCard
-export const ProductTeaserCard = (props: ProductTeaserCardProps) => {
+const ProductTeaserCard = (props: ProductTeaserCardProps) => {
   const {
     dailyVolume = "1,430,992,688",
     dailyVolumeLabel = "DAILY ANALYZED MESSAGES",
@@ -153,3 +153,6 @@ export const ProductTeaserCard = (props: ProductTeaserCardProps) => {
     </section>
   )
 }
+
+export { ProductTeaserCard }
+export default ProductTeaserCard

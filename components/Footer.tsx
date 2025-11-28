@@ -68,15 +68,15 @@ const defaultSections: FooterSection[] = [
   },
 ]
 
-export const Footer = ({
-  companyName = "FINANCE SETU", // Updated company name to "FINANCE SETU"
+const Footer = ({
+  companyName = "FINANCE SETU",
   tagline = "The Intelligence Layer for Modern Communication",
   sections = defaultSections,
   socialLinks = {
     twitter: "https://twitter.com",
     linkedin: "https://linkedin.com",
     github: "https://github.com",
-    email: "hello@financesetu.com", // Updated email to Finance SETU domain
+    email: "hello@financesetu.com",
   },
   copyrightText,
 }: FooterProps) => {
@@ -149,3 +149,6 @@ export const Footer = ({
     </footer>
   )
 }
+
+export { Footer }
+export default Footer

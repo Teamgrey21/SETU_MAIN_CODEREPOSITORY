@@ -115,7 +115,7 @@ const defaultBottomRowApps: IntegrationApp[] = [
 ]
 
 // @component: IntegrationCarousel
-export const IntegrationCarousel = ({
+const IntegrationCarousel = ({
   buttonText = "Explore Integrations",
   buttonHref = "#",
   title = "Integrates with your entire collaboration stack.",
@@ -161,3 +161,6 @@ export const IntegrationCarousel = ({
   // @return
   return null
 }
+
+export { IntegrationCarousel }
+export default IntegrationCarousel

@@ -424,7 +424,7 @@ const FigmaSprintCard = ({
   )
 }
 
-export const CaseStudiesCarousel = () => {
+const CaseStudiesCarousel = () => {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [direction, setDirection] = useState(0)
   const [isAutoPlaying, setIsAutoPlaying] = useState(true)
@@ -652,3 +652,6 @@ export const CaseStudiesCarousel = () => {
     </div>
   )
 }
+
+export { CaseStudiesCarousel }
+export default CaseStudiesCarousel

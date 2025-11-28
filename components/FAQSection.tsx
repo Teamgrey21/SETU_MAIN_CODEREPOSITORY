@@ -33,7 +33,7 @@ const defaultFAQs: FAQItem[] = [
       "Getting started with Setu is simple. Sign up with your email or Google account, tell us about your financial goals or challenges, and our AI-powered system will guide you through personalized solutions. Whether you need help understanding loan documents, calculating EMI affordability, filing taxes, or navigating startup registrations, Setu provides step-by-step guidance tailored to your specific situation.",
   },
 ]
-export const FAQSection = ({ title = "Frequently asked questions", faqs = defaultFAQs }: FAQSectionProps) => {
+const FAQSection = ({ title = "Frequently asked questions", faqs = defaultFAQs }: FAQSectionProps) => {
   const [openIndex, setOpenIndex] = useState<number | null>(null)
   const toggleFAQ = (index: number) => {
     setOpenIndex(openIndex === index ? null : index)
@@ -132,3 +132,6 @@ export const FAQSection = ({ title = "Frequently asked questions", faqs = defaul
     </section>
   )
 }
+
+export { FAQSection }
+export default FAQSection

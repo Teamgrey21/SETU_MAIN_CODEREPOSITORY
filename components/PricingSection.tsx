@@ -1,8 +1,6 @@
 "use client"
 
 import * as React from "react"
-import { CheckIcon } from "@radix-ui/react-icons"
-import { cn } from "@/lib/utils"
 
 type PlanLevel = "starter" | "pro" | "enterprise"
 
@@ -65,11 +63,12 @@ function shouldShowCheck(included: PricingFeature["included"], level: PlanLevel)
   return false
 }
 
-export function PricingSection() {
+const PricingSection = () => {
   const [isYearly, setIsYearly] = React.useState(false)
   const [selectedPlan, setSelectedPlan] = React.useState<PlanLevel>("pro")
 
-  return (
-    null
-  )
+  return null
 }
+
+export { PricingSection }
+export default PricingSection
