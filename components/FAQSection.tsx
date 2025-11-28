@@ -13,19 +13,24 @@ type FAQSectionProps = {
 }
 const defaultFAQs: FAQItem[] = [
   {
-    question: "What is Auralink and how does it work?",
+    question: "What exactly is Setu?",
     answer:
-      "Auralink is an AI-powered intelligence layer that connects all your communication tools—calls, chats, and meetings—into a unified system. It analyzes conversations in real-time to provide insights on sentiment, tone, team alignment, and collaboration patterns. Simply integrate Auralink with your existing tools like Slack, Zoom, or Microsoft Teams, and start gaining actionable insights immediately.",
+      "Setu is your personal financial guide that simplifies complex money matters in India. We help you navigate everything from loan applications and EMI management to investment taxes and startup filings. Think of Setu as the bridge between you and financial clarity—breaking down confusing jargon into clear, actionable steps you can understand and control.",
   },
   {
-    question: "How does Auralink use my data to build a custom AI chat?",
+    question: "Why should I choose Setu?",
     answer:
-      "Auralink processes your communication data using advanced natural language processing and machine learning models. All data is encrypted end-to-end and processed in compliance with enterprise-grade security standards. Your data is never shared with third parties, and you maintain complete control over what gets analyzed. The AI learns from patterns in your team's communication to provide personalized insights specific to your organization.",
+      "Unlike traditional financial advisors or complicated apps, Setu explains every financial decision in simple terms. We don't just tell you what to do—we teach you why, empowering you with knowledge. Whether you're dealing with educational loans, managing multiple EMIs, or trying to understand investment taxes, Setu provides personalized guidance that puts you in control of your financial future.",
   },
   {
-    question: "How do I get started with Auralink and what are the pricing options?",
+    question: "Who can benefit using Setu?",
     answer:
-      "Getting started is simple: sign up for a free trial, connect your communication tools, and start analyzing within minutes. We offer flexible pricing tiers: Starter (free for small teams), Professional ($29/user/month), and Enterprise (custom pricing with dedicated support). All plans include core features like sentiment analysis and real-time insights. Contact our sales team for volume discounts and custom enterprise solutions.",
+      "Setu is designed for anyone navigating the Indian financial system—from students dealing with education loans to young professionals managing EMIs, entrepreneurs handling startup compliance, or individuals trying to optimize their investments and taxes. If financial paperwork, loan terms, or tax regulations confuse you, Setu is here to help you understand and manage it all with confidence.",
+  },
+  {
+    question: "How can you use Setu?",
+    answer:
+      "Getting started with Setu is simple. Sign up with your email or Google account, tell us about your financial goals or challenges, and our AI-powered system will guide you through personalized solutions. Whether you need help understanding loan documents, calculating EMI affordability, filing taxes, or navigating startup registrations, Setu provides step-by-step guidance tailored to your specific situation.",
   },
 ]
 export const FAQSection = ({ title = "Frequently asked questions", faqs = defaultFAQs }: FAQSectionProps) => {

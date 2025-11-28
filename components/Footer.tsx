@@ -1,5 +1,5 @@
 "use client"
-import { Github, Twitter, Linkedin, Mail } from "lucide-react"
+import { Github, Mail } from "lucide-react"
 import { motion } from "framer-motion"
 
 type FooterLink = {
@@ -69,7 +69,7 @@ const defaultSections: FooterSection[] = [
 ]
 
 export const Footer = ({
-  companyName = "Auralink",
+  companyName = "FINANCE SETU", // Updated company name to "FINANCE SETU"
   tagline = "The Intelligence Layer for Modern Communication",
   sections = defaultSections,
   socialLinks = {
@@ -84,9 +84,9 @@ export const Footer = ({
   const copyright = copyrightText || `© ${currentYear} ${companyName}. All rights reserved.`
   return (
     <footer className="w-full bg-[#fafafa] border-t border-[#e5e5e5]">
-      <div className="max-w-[1200px] mx-auto px-8 py-16">
-        {/* Main Footer Content */}
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-8 mb-12">
+      {/* Main Footer Content */}
+      <div className="max-w-[1200px] mx-auto px-8 py-8">
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-8 mb-6">
           {/* Brand Column */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -109,24 +109,6 @@ export const Footer = ({
 
             {/* Social Links */}
             <div className="flex items-center gap-3 mt-6">
-              {socialLinks.twitter && (
-                <a
-                  href={socialLinks.twitter}
-                  className="w-9 h-9 flex items-center justify-center rounded-full bg-white border border-[#e5e5e5] text-[#666666] hover:text-[#202020] hover:border-[#202020] transition-colors duration-150"
-                  aria-label="Twitter"
-                >
-                  <Twitter className="w-4 h-4" />
-                </a>
-              )}
-              {socialLinks.linkedin && (
-                <a
-                  href={socialLinks.linkedin}
-                  className="w-9 h-9 flex items-center justify-center rounded-full bg-white border border-[#e5e5e5] text-[#666666] hover:text-[#202020] hover:border-[#202020] transition-colors duration-150"
-                  aria-label="LinkedIn"
-                >
-                  <Linkedin className="w-4 h-4" />
-                </a>
-              )}
               {socialLinks.github && (
                 <a
                   href={socialLinks.github}
@@ -147,11 +129,6 @@ export const Footer = ({
               )}
             </div>
           </motion.div>
-
-          {/* Link Sections */}
-          {sections.map((section, index) => (
-            null
-          ))}
         </div>
 
         {/* Bottom Bar */}
@@ -160,13 +137,12 @@ export const Footer = ({
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.6 }}
-          className="pt-8 border-t border-[#e5e5e5]"
+          className="pt-6 border-t border-[#e5e5e5]"
         >
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-[#666666]" style={{ fontFamily: "Figtree" }}>
               {copyright}
             </p>
-            
           </div>
         </motion.div>
       </div>
