@@ -27,6 +27,7 @@ import {
   User,
   Newspaper,
   Trash2,
+  LogOut,
 } from "lucide-react"
 
 export default function UserSectionPage() {
@@ -35,6 +36,39 @@ export default function UserSectionPage() {
   const [messages, setMessages] = useState<Array<{ type: "user" | "bot"; text: string }>>([])
   const [inputValue, setInputValue] = useState("")
   const [isProcessing, setIsProcessing] = useState(false)
+
+  const [settingsData, setSettingsData] = useState({
+    name: "Abby Cooper",
+    age: "28",
+    occupation: "Working Professional (salaried employee)",
+    totalIncome: "75000",
+    totalExpenses: "45000",
+    savings: "30000",
+    majorAsset: "House",
+    assetValue: "5000000",
+    selfInvestment: "Yeha I do",
+    sendMoneyToFamily: "Yes",
+    hasInvestedBefore: "Yes",
+    investmentTypes: ["Stocks", "Mutual Funds", "FD"],
+    longTermGoal: "Buy a house",
+    longTermAmount: "2000000",
+    shortTermGoal: "Save for vacation",
+    shortTermAmount: "50000",
+    lifePlanningApproach: "I believe in systematic planning and regular investments",
+    likedOnboarding: "Yes",
+  })
+
+  const occupations = ["Student", "Working Professional (salaried employee)", "Self Employed / Entrepreneur", "Retired"]
+  const investmentOptions = [
+    "Stocks",
+    "Precious Metals (Gold or Silver)",
+    "FD",
+    "Crypto",
+    "Digital Gold",
+    "Mutual Funds",
+    "Real Estate",
+    "Business Investment",
+  ]
 
   const newsItems = [
     {
@@ -149,9 +183,10 @@ export default function UserSectionPage() {
   return (
     <div className="min-h-screen w-full bg-black flex">
       {/* Sidebar */}
-      <aside className="w-80 bg-white border-r border-[#e5e5e5] flex flex-col">
+      <aside className="w-80 h-screen bg-white border-r border-[#e5e5e5] flex flex-col sticky top-0">
         {/* Header */}
-        <div className="p-6 border-b border-[#e5e5e5] flex items-center justify-between">
+        {/* Added flex-shrink-0 to prevent header from shrinking */}
+        <div className="p-6 border-b border-[#e5e5e5] flex items-center justify-between flex-shrink-0">
           <div className="flex items-center gap-3">
             {/* Logo */}
             <div className="w-10 h-10 bg-[#202020] rounded-lg flex items-center justify-center">
@@ -175,7 +210,7 @@ export default function UserSectionPage() {
         </div>
 
         {/* Main Navigation */}
-        <nav className="flex-1 p-4">
+        <nav className="flex-1 p-4 overflow-y-auto">
           <div className="space-y-1">
             {menuItems.map((item) => {
               const Icon = item.icon
@@ -198,7 +233,7 @@ export default function UserSectionPage() {
         </nav>
 
         {/* Bottom Section */}
-        <div className="p-4 border-t border-[#e5e5e5]">
+        <div className="p-4 border-t border-[#e5e5e5] flex-shrink-0">
           {/* Social Icons */}
           <div className="flex items-center gap-3 mb-4 px-4">
             <a
@@ -1042,16 +1077,447 @@ export default function UserSectionPage() {
         {/* Financial Summaries Section */}
         {activeSection === "Financial Summaries" && (
           <div className="flex-1 flex flex-col bg-[#f9fafb] p-8 gap-6 overflow-y-auto">
-            {/* Placeholder for Financial Summaries */}
             <div className="bg-white border border-[#e5e5e5] rounded-2xl p-6">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-2">
+                  <h2
+                    className="text-xl font-semibold text-[#202020]"
+                    style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                  >
+                    Financial Summaries
+                  </h2>
+                </div>
+              </div>
+
+              {/* Chat History Items */}
+              <div className="space-y-4">
+                {[
+                  {
+                    avatar: "FS",
+                    color: "bg-blue-500",
+                    reportName: "EMI Calculation Report",
+                    fullUrl: "financesetu.com/chats",
+                    time: "7m",
+                    description: "EMI calculation query",
+                  },
+                  {
+                    avatar: "FS",
+                    color: "bg-blue-500",
+                    reportName: "Tax Planning Report",
+                    fullUrl: "financesetu.com/investments",
+                    time: "10d",
+                    description: "Tax planning discussion",
+                  },
+                  {
+                    avatar: "FS",
+                    color: "bg-orange-500",
+                    reportName: "Business Setup Report",
+                    fullUrl: "financesetu.com/startup",
+                    time: "10d",
+                    description: "Business setup guidance",
+                  },
+                  {
+                    avatar: "FS",
+                    color: "bg-yellow-500",
+                    reportName: "Loan Comparison Report",
+                    fullUrl: "financesetu.com/loans",
+                    time: "10d",
+                    description: "Loan comparison queries",
+                  },
+                  {
+                    avatar: "QS",
+                    color: "bg-red-500",
+                    reportName: "Bank Account Report",
+                    fullUrl: "financesetu.com/savings",
+                    time: "10d",
+                    description: "Bank account questions",
+                  },
+                ].map((item, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-4 p-4 border border-[#e5e5e5] rounded-xl hover:shadow-sm transition-shadow"
+                  >
+                    {/* Avatar */}
+                    <div
+                      className={`${item.color} w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0`}
+                    >
+                      <span className="text-white font-semibold text-sm">{item.avatar}</span>
+                    </div>
+
+                    {/* URL and Details */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span
+                          className="font-semibold text-[#202020]"
+                          style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                        >
+                          {item.reportName}
+                        </span>
+                        <button className="text-[#6b7280] hover:text-[#202020] transition-colors"></button>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-[#6b7280]">
+                        <span>•</span>
+                        <span>{item.time}</span>
+                      </div>
+                    </div>
+
+                    {/* Description */}
+                    <div className="flex-1 min-w-0"></div>
+
+                    {/* Actions */}
+                    <div className="flex items-center gap-3 flex-shrink-0">
+                      <button
+                        className="flex items-center gap-2 px-6 py-2 bg-[#202020] text-white rounded-lg hover:bg-[#404040] transition-colors font-medium"
+                        style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                      >
+                        <Download className="w-4 h-4" />
+                        Download
+                      </button>
+                      <button className="text-[#6b7280] hover:text-red-500 transition-colors">
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Settings Section */}
+        {activeSection === "Settings" && (
+          <div className="flex-1 flex flex-col bg-[#f9fafb] p-8 gap-6 overflow-y-auto">
+            <div className="max-w-4xl mx-auto w-full space-y-6">
+              {/* Header */}
+              <div className="mb-6">
+                <h1
+                  className="text-3xl font-semibold text-[#202020] mb-2"
+                  style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                >
+                  Settings
+                </h1>
+                <p className="text-[#606060]" style={{ fontFamily: "var(--font-figtree), Figtree" }}>
+                  Manage your account and preferences
+                </p>
+              </div>
+
+              {/* Personal Information */}
+              <div className="bg-white border border-[#e5e5e5] rounded-2xl p-6">
+                <h2
+                  className="text-xl font-semibold text-[#202020] mb-4"
+                  style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                >
+                  Personal Information
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label
+                      className="block text-sm font-medium text-[#404040] mb-2"
+                      style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                    >
+                      Name
+                    </label>
+                    <input
+                      type="text"
+                      value={settingsData.name}
+                      onChange={(e) => setSettingsData({ ...settingsData, name: e.target.value })}
+                      className="w-full px-4 py-3 bg-[#f9fafb] border border-[#e5e5e5] rounded-xl text-[#202020] focus:outline-none focus:ring-2 focus:ring-[#202020]/20"
+                      style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                    />
+                  </div>
+                  <div>
+                    <label
+                      className="block text-sm font-medium text-[#404040] mb-2"
+                      style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                    >
+                      Age
+                    </label>
+                    <input
+                      type="text"
+                      value={settingsData.age}
+                      onChange={(e) => setSettingsData({ ...settingsData, age: e.target.value })}
+                      className="w-full px-4 py-3 bg-[#f9fafb] border border-[#e5e5e5] rounded-xl text-[#202020] focus:outline-none focus:ring-2 focus:ring-[#202020]/20"
+                      style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                    />
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <label
+                    className="block text-sm font-medium text-[#404040] mb-2"
+                    style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                  >
+                    Occupation
+                  </label>
+                  <div className="grid grid-cols-2 gap-3">
+                    {occupations.map((occupation) => (
+                      <button
+                        key={occupation}
+                        onClick={() => setSettingsData({ ...settingsData, occupation })}
+                        className={`px-4 py-3 rounded-xl text-left text-sm transition-all ${
+                          settingsData.occupation === occupation
+                            ? "bg-[#202020] text-white"
+                            : "bg-[#f9fafb] text-[#404040] hover:bg-[#f0f0f0] border border-[#e5e5e5]"
+                        }`}
+                        style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                      >
+                        {occupation}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Financial Information */}
+              <div className="bg-white border border-[#e5e5e5] rounded-2xl p-6">
+                <h2
+                  className="text-xl font-semibold text-[#202020] mb-4"
+                  style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                >
+                  Financial Information
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label
+                      className="block text-sm font-medium text-[#404040] mb-2"
+                      style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                    >
+                      Total Income (per month)
+                    </label>
+                    <div className="relative">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#404040]">₹</span>
+                      <input
+                        type="text"
+                        value={settingsData.totalIncome}
+                        onChange={(e) => setSettingsData({ ...settingsData, totalIncome: e.target.value })}
+                        className="w-full pl-10 pr-4 py-3 bg-[#f9fafb] border border-[#e5e5e5] rounded-xl text-[#202020] focus:outline-none focus:ring-2 focus:ring-[#202020]/20"
+                        style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label
+                      className="block text-sm font-medium text-[#404040] mb-2"
+                      style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                    >
+                      Total Expenses (per month)
+                    </label>
+                    <div className="relative">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#404040]">₹</span>
+                      <input
+                        type="text"
+                        value={settingsData.totalExpenses}
+                        onChange={(e) => setSettingsData({ ...settingsData, totalExpenses: e.target.value })}
+                        className="w-full pl-10 pr-4 py-3 bg-[#f9fafb] border border-[#e5e5e5] rounded-xl text-[#202020] focus:outline-none focus:ring-2 focus:ring-[#202020]/20"
+                        style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label
+                      className="block text-sm font-medium text-[#404040] mb-2"
+                      style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                    >
+                      Savings (per month)
+                    </label>
+                    <div className="relative">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#404040]">₹</span>
+                      <input
+                        type="text"
+                        value={settingsData.savings}
+                        onChange={(e) => setSettingsData({ ...settingsData, savings: e.target.value })}
+                        className="w-full pl-10 pr-4 py-3 bg-[#f9fafb] border border-[#e5e5e5] rounded-xl text-[#202020] focus:outline-none focus:ring-2 focus:ring-[#202020]/20"
+                        style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label
+                      className="block text-sm font-medium text-[#404040] mb-2"
+                      style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                    >
+                      Major Asset
+                    </label>
+                    <input
+                      type="text"
+                      value={settingsData.majorAsset}
+                      onChange={(e) => setSettingsData({ ...settingsData, majorAsset: e.target.value })}
+                      className="w-full px-4 py-3 bg-[#f9fafb] border border-[#e5e5e5] rounded-xl text-[#202020] focus:outline-none focus:ring-2 focus:ring-[#202020]/20"
+                      style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label
+                      className="block text-sm font-medium text-[#404040] mb-2"
+                      style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                    >
+                      Asset Value
+                    </label>
+                    <div className="relative">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#404040]">₹</span>
+                      <input
+                        type="text"
+                        value={settingsData.assetValue}
+                        onChange={(e) => setSettingsData({ ...settingsData, assetValue: e.target.value })}
+                        className="w-full pl-10 pr-4 py-3 bg-[#f9fafb] border border-[#e5e5e5] rounded-xl text-[#202020] focus:outline-none focus:ring-2 focus:ring-[#202020]/20"
+                        style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Investment Preferences */}
+              <div className="bg-white border border-[#e5e5e5] rounded-2xl p-6">
+                <h2
+                  className="text-xl font-semibold text-[#202020] mb-4"
+                  style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                >
+                  Investment Preferences
+                </h2>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {investmentOptions.map((option) => (
+                      <button
+                        key={option}
+                        onClick={() => {
+                          const types = settingsData.investmentTypes.includes(option)
+                            ? settingsData.investmentTypes.filter((t) => t !== option)
+                            : [...settingsData.investmentTypes, option]
+                          setSettingsData({ ...settingsData, investmentTypes: types })
+                        }}
+                        className={`px-4 py-3 rounded-xl text-sm transition-all ${
+                          settingsData.investmentTypes.includes(option)
+                            ? "bg-[#202020] text-white"
+                            : "bg-[#f9fafb] text-[#404040] hover:bg-[#f0f0f0] border border-[#e5e5e5]"
+                        }`}
+                        style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                      >
+                        {option}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Financial Goals */}
+              <div className="bg-white border border-[#e5e5e5] rounded-2xl p-6">
+                <h2
+                  className="text-xl font-semibold text-[#202020] mb-4"
+                  style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                >
+                  Financial Goals
+                </h2>
+                <div className="space-y-4">
+                  <div>
+                    <label
+                      className="block text-sm font-medium text-[#404040] mb-2"
+                      style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                    >
+                      Long-term Goal
+                    </label>
+                    <input
+                      type="text"
+                      value={settingsData.longTermGoal}
+                      onChange={(e) => setSettingsData({ ...settingsData, longTermGoal: e.target.value })}
+                      className="w-full px-4 py-3 bg-[#f9fafb] border border-[#e5e5e5] rounded-xl text-[#202020] focus:outline-none focus:ring-2 focus:ring-[#202020]/20 mb-2"
+                      style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                    />
+                    <div className="relative">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#404040]">₹</span>
+                      <input
+                        type="text"
+                        placeholder="Amount"
+                        value={settingsData.longTermAmount}
+                        onChange={(e) => setSettingsData({ ...settingsData, longTermAmount: e.target.value })}
+                        className="w-full pl-10 pr-4 py-3 bg-[#f9fafb] border border-[#e5e5e5] rounded-xl text-[#202020] focus:outline-none focus:ring-2 focus:ring-[#202020]/20"
+                        style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label
+                      className="block text-sm font-medium text-[#404040] mb-2"
+                      style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                    >
+                      Short-term Goal
+                    </label>
+                    <input
+                      type="text"
+                      value={settingsData.shortTermGoal}
+                      onChange={(e) => setSettingsData({ ...settingsData, shortTermGoal: e.target.value })}
+                      className="w-full px-4 py-3 bg-[#f9fafb] border border-[#e5e5e5] rounded-xl text-[#202020] focus:outline-none focus:ring-2 focus:ring-[#202020]/20 mb-2"
+                      style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                    />
+                    <div className="relative">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#404040]">₹</span>
+                      <input
+                        type="text"
+                        placeholder="Amount"
+                        value={settingsData.shortTermAmount}
+                        onChange={(e) => setSettingsData({ ...settingsData, shortTermAmount: e.target.value })}
+                        className="w-full pl-10 pr-4 py-3 bg-[#f9fafb] border border-[#e5e5e5] rounded-xl text-[#202020] focus:outline-none focus:ring-2 focus:ring-[#202020]/20"
+                        style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label
+                      className="block text-sm font-medium text-[#404040] mb-2"
+                      style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                    >
+                      Life Planning Approach
+                    </label>
+                    <textarea
+                      value={settingsData.lifePlanningApproach}
+                      onChange={(e) => setSettingsData({ ...settingsData, lifePlanningApproach: e.target.value })}
+                      rows={4}
+                      className="w-full px-4 py-3 bg-[#f9fafb] border border-[#e5e5e5] rounded-xl text-[#202020] focus:outline-none focus:ring-2 focus:ring-[#202020]/20 resize-none"
+                      style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-between gap-4 pt-4">
+                <button
+                  onClick={() => {
+                    // Save settings logic here
+                    alert("Settings saved successfully!")
+                  }}
+                  className="flex-1 px-6 py-3 bg-[#202020] text-white rounded-xl hover:bg-[#404040] transition-colors font-medium"
+                  style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                >
+                  Save Changes
+                </button>
+                <button
+                  onClick={() => {
+                    window.location.href = "/landing"
+                  }}
+                  className="px-6 py-3 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-colors font-medium flex items-center gap-2"
+                  style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                >
+                  <LogOut className="w-5 h-5" />
+                  Logout
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Help Center Section */}
+        {activeSection === "Help Center" && (
+          <div className="flex-1 flex items-center justify-center bg-[#f9fafb]">
+            <div className="text-center">
+              <HelpCircle className="w-16 h-16 text-[#9ca3af] mx-auto mb-4" />
               <h2
-                className="text-xl font-semibold text-[#202020] mb-6"
+                className="text-2xl font-semibold text-[#202020] mb-2"
                 style={{ fontFamily: "var(--font-figtree), Figtree" }}
               >
-                Financial Summaries
+                Help Center
               </h2>
-              <p className="text-[#6b7280] mb-6" style={{ fontFamily: "var(--font-figtree), Figtree" }}>
-                Placeholder for Financial Summaries content.
+              <p className="text-[#606060]" style={{ fontFamily: "var(--font-figtree), Figtree" }}>
+                Coming soon
               </p>
             </div>
           </div>
