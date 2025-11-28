@@ -7,7 +7,7 @@ import CaseStudiesCarousel from "@/components/CaseStudiesCarousel"
 import PricingSection from "@/components/PricingSection"
 import FAQSection from "@/components/FAQSection"
 import Footer from "@/components/Footer"
-import AuthSection from "@/components/AuthSection"
+import { AuthSection } from "@/components/AuthSection"
 
 export default function LandingPage() {
   return (

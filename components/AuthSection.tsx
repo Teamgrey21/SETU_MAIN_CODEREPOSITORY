@@ -31,10 +31,11 @@ export const AuthSection = () => {
           viewport={{ once: true }}
           className="relative rounded-[40px] p-12 lg:p-16 overflow-hidden"
           style={{
-            background: "rgba(255, 255, 255, 0.4)",
-            backdropFilter: "blur(20px)",
-            border: "1px solid rgba(255, 255, 255, 0.3)",
-            boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.08)",
+            background: "rgba(255, 255, 255, 0.25)",
+            backdropFilter: "blur(30px)",
+            WebkitBackdropFilter: "blur(30px)",
+            border: "1px solid rgba(255, 255, 255, 0.4)",
+            boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.06), inset 0 1px 1px 0 rgba(255, 255, 255, 0.5)",
           }}
         >
           {/* Title */}

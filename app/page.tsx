@@ -1,7 +1,5 @@
 "use client"
 
-import { useEffect } from "react"
-import { useRouter } from "next/navigation"
 import { PortfolioNavbar } from "@/components/PortfolioNavbar"
 import { ProductTeaserCard } from "@/components/ProductTeaserCard"
 import { AuthSection } from "@/components/AuthSection"
@@ -13,12 +11,6 @@ import { FAQSection } from "@/components/FAQSection"
 import { Footer } from "@/components/Footer"
 
 export default function Page() {
-  const router = useRouter()
-
-  useEffect(() => {
-    router.push("/user-section")
-  }, [router])
-
   return (
     <>
       <PortfolioNavbar />

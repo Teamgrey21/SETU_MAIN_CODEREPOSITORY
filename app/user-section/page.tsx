@@ -36,6 +36,7 @@ export default function UserSectionPage() {
   const [messages, setMessages] = useState<Array<{ type: "user" | "bot"; text: string }>>([])
   const [inputValue, setInputValue] = useState("")
   const [isProcessing, setIsProcessing] = useState(false)
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
 
   const [settingsData, setSettingsData] = useState({
     name: "Abby Cooper",
@@ -183,30 +184,44 @@ export default function UserSectionPage() {
   return (
     <div className="min-h-screen w-full bg-black flex">
       {/* Sidebar */}
-      <aside className="w-80 h-screen bg-white border-r border-[#e5e5e5] flex flex-col sticky top-0">
+      <aside
+        className={`${isSidebarCollapsed ? "w-20" : "w-80"} h-screen bg-white border-r border-[#e5e5e5] flex flex-col sticky top-0 transition-all duration-300`}
+      >
         {/* Header */}
         {/* Added flex-shrink-0 to prevent header from shrinking */}
         <div className="p-6 border-b border-[#e5e5e5] flex items-center justify-between flex-shrink-0">
-          <div className="flex items-center gap-3">
-            {/* Logo */}
-            <div className="w-10 h-10 bg-[#202020] rounded-lg flex items-center justify-center">
+          {!isSidebarCollapsed && (
+            <div className="flex items-center gap-3">
+              {/* Logo */}
+              <div className="w-10 h-10 bg-[#202020] rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-lg">FS</span>
+              </div>
+              <div className="flex flex-col">
+                <h2
+                  className="text-[#202020] font-semibold text-lg"
+                  style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                >
+                  Finance Setu
+                </h2>
+                <p className="text-[#6b7280] text-xs" style={{ fontFamily: "var(--font-figtree), Figtree" }}>
+                  mail.financesetu@gmail.com
+                </p>
+              </div>
+            </div>
+          )}
+          {isSidebarCollapsed && (
+            <div className="w-10 h-10 bg-[#202020] rounded-lg flex items-center justify-center mx-auto">
               <span className="text-white font-bold text-lg">FS</span>
             </div>
-            <div className="flex flex-col">
-              <h2
-                className="text-[#202020] font-semibold text-lg"
-                style={{ fontFamily: "var(--font-figtree), Figtree" }}
-              >
-                Finance Setu
-              </h2>
-              <p className="text-[#6b7280] text-xs" style={{ fontFamily: "var(--font-figtree), Figtree" }}>
-                mail.financesetu@gmail.com
-              </p>
-            </div>
-          </div>
-          <button className="p-1 hover:bg-[#f3f4f6] rounded-md transition-colors">
-            <ChevronLeft className="w-5 h-5 text-[#6b7280]" />
-          </button>
+          )}
+          {!isSidebarCollapsed && (
+            <button
+              onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+              className="p-1 hover:bg-[#f3f4f6] rounded-md transition-colors"
+            >
+              <ChevronLeft className="w-5 h-5 text-[#6b7280]" />
+            </button>
+          )}
         </div>
 
         {/* Main Navigation */}
@@ -221,11 +236,12 @@ export default function UserSectionPage() {
                   onClick={() => setActiveSection(item.name)}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
                     isActive ? "bg-[#f3f4f6] text-[#202020]" : "text-[#6b7280] hover:bg-[#f9fafb]"
-                  }`}
+                  } ${isSidebarCollapsed ? "justify-center" : ""}`}
                   style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                  title={isSidebarCollapsed ? item.name : ""}
                 >
                   <Icon className="w-5 h-5" />
-                  <span className="font-medium">{item.name}</span>
+                  {!isSidebarCollapsed && <span className="font-medium">{item.name}</span>}
                 </button>
               )
             })}
@@ -235,16 +251,21 @@ export default function UserSectionPage() {
         {/* Bottom Section */}
         <div className="p-4 border-t border-[#e5e5e5] flex-shrink-0">
           {/* Social Icons */}
-          <div className="flex items-center gap-3 mb-4 px-4">
+          <div className={`flex items-center gap-3 mb-4 ${isSidebarCollapsed ? "flex-col px-0" : "px-4"}`}>
             <a
               href="https://github.com"
               target="_blank"
               rel="noopener noreferrer"
               className="p-2 hover:bg-[#f3f4f6] rounded-md transition-colors"
+              title="GitHub"
             >
               <Github className="w-5 h-5 text-[#6b7280]" />
             </a>
-            <a href="mailto:mail.financesetu@gmail.com" className="p-2 hover:bg-[#f3f4f6] rounded-md transition-colors">
+            <a
+              href="mailto:mail.financesetu@gmail.com"
+              className="p-2 hover:bg-[#f3f4f6] rounded-md transition-colors"
+              title="Email"
+            >
               <Mail className="w-5 h-5 text-[#6b7280]" />
             </a>
           </div>
@@ -257,15 +278,26 @@ export default function UserSectionPage() {
                 <button
                   key={item.name}
                   onClick={() => setActiveSection(item.name)}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-[#6b7280] hover:bg-[#f9fafb] transition-all"
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-[#6b7280] hover:bg-[#f9fafb] transition-all ${isSidebarCollapsed ? "justify-center" : ""}`}
                   style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                  title={isSidebarCollapsed ? item.name : ""}
                 >
                   <Icon className="w-5 h-5" />
-                  <span className="font-medium">{item.name}</span>
+                  {!isSidebarCollapsed && <span className="font-medium">{item.name}</span>}
                 </button>
               )
             })}
           </div>
+
+          {isSidebarCollapsed && (
+            <button
+              onClick={() => setIsSidebarCollapsed(false)}
+              className="w-full flex items-center justify-center px-4 py-3 mt-2 rounded-lg text-[#6b7280] hover:bg-[#f9fafb] transition-all"
+              title="Expand sidebar"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          )}
         </div>
       </aside>
 
@@ -535,8 +567,43 @@ export default function UserSectionPage() {
 
             {/* Empty Bottom Sections */}
             <div className="grid grid-cols-2 gap-6">
-              <div className="bg-white border-2 border-dashed border-[#e5e5e5] rounded-2xl h-64"></div>
-              <div className="bg-white border-2 border-dashed border-[#e5e5e5] rounded-2xl h-64"></div>
+              {/* Home Navigation Card */}
+              <button
+                onClick={() => setActiveSection("Home")}
+                className="bg-white border border-[#e5e5e5] rounded-2xl p-8 hover:shadow-lg transition-all group h-64 flex flex-col items-center justify-center"
+              >
+                <div className="w-16 h-16 bg-[#f3f4f6] rounded-2xl flex items-center justify-center mb-4 group-hover:bg-[#202020] transition-colors">
+                  <Home className="w-8 h-8 text-[#202020] group-hover:text-white transition-colors" />
+                </div>
+                <h3
+                  className="text-xl font-semibold text-[#202020] mb-2"
+                  style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                >
+                  Go to Home
+                </h3>
+                <p className="text-[#6b7280] text-center" style={{ fontFamily: "var(--font-figtree), Figtree" }}>
+                  View your dashboard and profile
+                </p>
+              </button>
+
+              {/* Financial Summaries Navigation Card */}
+              <button
+                onClick={() => setActiveSection("Financial Summaries")}
+                className="bg-white border border-[#e5e5e5] rounded-2xl p-8 hover:shadow-lg transition-all group h-64 flex flex-col items-center justify-center"
+              >
+                <div className="w-16 h-16 bg-[#f3f4f6] rounded-2xl flex items-center justify-center mb-4 group-hover:bg-[#202020] transition-colors">
+                  <FileText className="w-8 h-8 text-[#202020] group-hover:text-white transition-colors" />
+                </div>
+                <h3
+                  className="text-xl font-semibold text-[#202020] mb-2"
+                  style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                >
+                  Financial Summaries
+                </h3>
+                <p className="text-[#6b7280] text-center" style={{ fontFamily: "var(--font-figtree), Figtree" }}>
+                  Access your financial reports
+                </p>
+              </button>
             </div>
           </div>
         )}
