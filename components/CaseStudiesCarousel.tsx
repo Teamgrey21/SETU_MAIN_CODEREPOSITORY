@@ -554,7 +554,7 @@ const CaseStudiesCarousel = () => {
                   >
                     "{currentStudy.quote}"
                   </p>
-                  <cite className="text-sm text-muted-foreground">{currentStudy.attribution}</cite>
+                  
                 </blockquote>
               </motion.div>
             </AnimatePresence>
