@@ -11,17 +11,28 @@ import FAQSection from "@/components/FAQSection"
 import Footer from "@/components/Footer"
 
 export default function Page() {
+  console.log("[v0] Page component rendering")
+
   return (
-    <>
+    <div className="min-h-screen w-full">
+      {console.log("[v0] Rendering PortfolioNavbar")}
       <PortfolioNavbar />
+      {console.log("[v0] Rendering ProductTeaserCard")}
       <ProductTeaserCard />
+      {console.log("[v0] Rendering AuthSection")}
       <AuthSection />
+      {console.log("[v0] Rendering BankingScaleHero")}
       <BankingScaleHero />
+      {console.log("[v0] Rendering CaseStudiesCarousel")}
       <CaseStudiesCarousel />
+      {console.log("[v0] Rendering IntegrationCarousel")}
       <IntegrationCarousel />
+      {console.log("[v0] Rendering PricingSection")}
       <PricingSection />
+      {console.log("[v0] Rendering FAQSection")}
       <FAQSection />
+      {console.log("[v0] Rendering Footer")}
       <Footer />
-    </>
+    </div>
   )
 }

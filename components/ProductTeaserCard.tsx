@@ -54,28 +54,7 @@ const ProductTeaserCard = (props: ProductTeaserCardProps) => {
               onClick={(e) => e.preventDefault()}
               className="flex flex-col gap-1 text-[#9a9a9a]"
             >
-              <motion.span
-                initial={{
-                  transform: "translateY(20px)",
-                  opacity: 0,
-                }}
-                animate={{
-                  transform: "translateY(0px)",
-                  opacity: 1,
-                }}
-                transition={{
-                  duration: 0.4,
-                  ease: [0.645, 0.045, 0.355, 1],
-                  delay: 0.6,
-                }}
-                className="text-sm uppercase tracking-tight font-mono flex items-center gap-1"
-                style={{
-                  fontFamily: "var(--font-geist-mono), 'Geist Mono', ui-monospace, monospace",
-                }}
-              >
-                {dailyVolumeLabel}
-                <ArrowUpRight className="w-[0.71em] h-[0.71em]" />
-              </motion.span>
+              
               <span
                 className="text-[32px] leading-[160px] tracking-tight bg-gradient-to-r from-[#202020] via-[#00517f] via-[#52aee3] to-[#9ed2fc] bg-clip-text text-transparent"
                 style={{
