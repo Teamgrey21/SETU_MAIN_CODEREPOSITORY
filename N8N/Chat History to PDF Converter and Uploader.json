@@ -1,0 +1,226 @@
+{
+  "name": "Chat History to PDF Converter and Uploader",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "chat-history-pdf",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "2ac4a004-f762-48d9-b001-0ab3e4bde79e",
+      "name": "Event Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "e2c89525-39be-4051-b945-7ffc99715d26"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "supabaseUrl",
+              "value": "<__PLACEHOLDER_VALUE__Supabase project URL__>",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "chatTableName",
+              "value": "<__PLACEHOLDER_VALUE__Table name for chat history__>",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "storageTableName",
+              "value": "<__PLACEHOLDER_VALUE__Table name for PDF storage__>",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "02618c32-af82-4227-a0b0-6fa264355903",
+      "name": "Workflow Configuration",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "={{ $('Workflow Configuration').first().json.chatTableName }}",
+        "returnAll": true,
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "user_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.body.user_id }}"
+            },
+            {
+              "keyName": "session_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.body.session_id }}"
+            }
+          ]
+        }
+      },
+      "id": "9aaf3ed7-1700-459a-935b-7c03a3795f2d",
+      "name": "Get Chat History",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        448,
+        0
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "5kXA2SJUhPudI6vn",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get chat history from previous node\nconst chatHistory = $input.all();\n\n// Build HTML structure with styling\nlet html = `\n<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"UTF-8\">\n  <style>\n    body {\n      font-family: Arial, sans-serif;\n      max-width: 800px;\n      margin: 0 auto;\n      padding: 20px;\n      background-color: #f5f5f5;\n    }\n    .chat-container {\n      background-color: white;\n      border-radius: 8px;\n      padding: 20px;\n      box-shadow: 0 2px 4px rgba(0,0,0,0.1);\n    }\n    .chat-header {\n      text-align: center;\n      border-bottom: 2px solid #007bff;\n      padding-bottom: 15px;\n      margin-bottom: 20px;\n    }\n    .chat-header h1 {\n      color: #333;\n      margin: 0;\n    }\n    .message {\n      margin-bottom: 15px;\n      padding: 12px;\n      border-radius: 8px;\n    }\n    .user-message {\n      background-color: #e3f2fd;\n      margin-left: 20px;\n    }\n    .assistant-message {\n      background-color: #f5f5f5;\n      margin-right: 20px;\n    }\n    .message-role {\n      font-weight: bold;\n      margin-bottom: 5px;\n      color: #007bff;\n    }\n    .message-content {\n      color: #333;\n      line-height: 1.6;\n    }\n    .timestamp {\n      font-size: 0.85em;\n      color: #666;\n      margin-top: 5px;\n    }\n  </style>\n</head>\n<body>\n  <div class=\"chat-container\">\n    <div class=\"chat-header\">\n      <h1>Chat History</h1>\n    </div>\n`;\n\n// Process each chat message\nfor (const item of chatHistory) {\n  const message = item.json;\n  const role = message.role || 'user';\n  const content = message.content || message.message || '';\n  const timestamp = message.timestamp || message.created_at || new Date().toISOString();\n  \n  const messageClass = role === 'user' ? 'user-message' : 'assistant-message';\n  const roleLabel = role.charAt(0).toUpperCase() + role.slice(1);\n  \n  html += `\n    <div class=\"message ${messageClass}\">\n      <div class=\"message-role\">${roleLabel}</div>\n      <div class=\"message-content\">${content}</div>\n      <div class=\"timestamp\">${new Date(timestamp).toLocaleString()}</div>\n    </div>\n  `;\n}\n\n// Close HTML structure\nhtml += `\n  </div>\n</body>\n</html>\n`;\n\n// Return the HTML as output\nreturn [{ json: { html: html } }];"
+      },
+      "id": "d7fa8d33-fd8d-4708-9ec9-42357f196580",
+      "name": "Format Chat to HTML",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "html",
+        "options": {
+          "fileName": "={{ 'chat_history_' + $('Workflow Configuration').first().json.body.user_id + '_' + $('Workflow Configuration').first().json.body.session_id + '.pdf' }}"
+        }
+      },
+      "id": "9fe79384-d452-47b6-9136-29586488369b",
+      "name": "Convert HTML to PDF",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        896,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "tableId": "={{ $('Workflow Configuration').first().json.storageTableName }}",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "user_id",
+              "fieldValue": "={{ $('Workflow Configuration').first().json.body.user_id }}"
+            },
+            {
+              "fieldId": "session_id",
+              "fieldValue": "={{ $('Workflow Configuration').first().json.body.session_id }}"
+            },
+            {
+              "fieldId": "pdf_data",
+              "fieldValue": "={{ $binary.data }}"
+            }
+          ]
+        }
+      },
+      "id": "803e067c-2506-4be0-9e62-392b466c135a",
+      "name": "Upload PDF to Supabase",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        0
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "5kXA2SJUhPudI6vn",
+          "name": "Supabase account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Event Trigger": {
+      "main": [
+        [
+          {
+            "node": "Workflow Configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Workflow Configuration": {
+      "main": [
+        [
+          {
+            "node": "Get Chat History",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Chat History": {
+      "main": [
+        [
+          {
+            "node": "Format Chat to HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Chat to HTML": {
+      "main": [
+        [
+          {
+            "node": "Convert HTML to PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert HTML to PDF": {
+      "main": [
+        [
+          {
+            "node": "Upload PDF to Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a8b3f180-e240-4231-83af-e5db2838f1ad",
+  "meta": {
+    "instanceId": "e6c206dc36df7b9f4193f716d58b27a9903bca5548921a24d189bd684a56d270"
+  },
+  "id": "ieGoNABHB8X8R873",
+  "tags": []
+}
