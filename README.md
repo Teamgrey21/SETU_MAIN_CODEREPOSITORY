@@ -10,20 +10,9 @@ Finance SETU is your personal financial guide that simplifies complex money matt
 - **Startup Filing Assistance**: Simplified startup registration and compliance
 - **Financial Education**: Learn while you manage your finances
 
-## Getting Started
-
-First, run the development server:
-
-\`\`\`bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-\`\`\`
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+##Try [financesetu.teamgrey.dev]
 
 ## About
+Prototype Project for Mumbai Hacks
 
 Finance SETU bridges the gap between you and financial clarity, breaking down confusing jargon into clear, actionable steps you can understand and control.
