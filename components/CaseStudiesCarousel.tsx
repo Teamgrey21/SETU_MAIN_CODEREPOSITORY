@@ -32,7 +32,7 @@ const caseStudies: CaseStudy[] = [
     ),
     title: "Setu asks you about your financial personality to understand you better as your financial friend",
     features: ["Ask Setu", "Personal Finance", "Financial Summaries"],
-    quote: "Finance SETU gives us clarity on team alignment we never had before.",
+    quote: "Setu give answers based on your financial goals/personality to give you the most out of you",
     attribution: "Marie Chen, Head of Operations, Clandestine",
     accentColor: "#16b364",
     cards: [
@@ -128,7 +128,8 @@ const caseStudies: CaseStudy[] = [
     ),
     title: "Conversations with Setu get converted into detailed financial reports",
     features: ["Ask Setu", "Personal Finance", "Financial Summaries"],
-    quote: "With Finance SETU, we can see collaboration patterns that directly impact our product velocity.",
+    quote:
+      "All your conversations with Setu get converted into a detailed smart financial summary which you can refer back anytime",
     attribution: "Sarah Chen, VP Engineering, Cloudwatch",
     accentColor: "#3b82f6",
     cards: [
@@ -154,7 +155,7 @@ const caseStudies: CaseStudy[] = [
     ),
     title: "Setu not only tells you about your finances but teaches you about everything too",
     features: ["Ask Setu", "Financial Summaries"],
-    quote: "Finance SETU transformed how we understand our remote-first culture.",
+    quote: "Setu helps you learn through YouTube videos and organize your financial plans.",
     attribution: "Karri Saarinen, Co-founder, EightBall",
     accentColor: "#0A0D12",
     cards: [
@@ -235,72 +236,7 @@ const NotionCollaborationCard = ({
   delay: number
   zIndex: number
 }) => {
-  return (
-    <motion.div
-      initial={{
-        opacity: 0,
-        y: 20,
-        scale: 0.95,
-      }}
-      animate={{
-        opacity: 1,
-        y: 0,
-        scale: 1,
-      }}
-      transition={{
-        duration: 0.6,
-        ease: [0.76, 0, 0.24, 1],
-        delay,
-      }}
-      className="absolute w-[380px] rounded-xl p-6 backdrop-blur-xl"
-      style={{
-        backgroundColor: "rgba(255, 255, 255, 0.85)",
-        boxShadow: "inset 0 0 0 1px rgba(255, 255, 255, 0.8), 0 8px 32px 0 rgba(0, 0, 0, 0.12)",
-        filter: "drop-shadow(0 4px 6px rgba(30, 30, 44, 0.15))",
-        transform: "translate(-200px, -80px)",
-        zIndex,
-      }}
-    >
-      <div className="flex flex-col space-y-5">
-        <div className="flex items-center justify-between">
-          <h4 className="text-sm font-semibold text-foreground">Team Alignment</h4>
-          <span className="text-xs text-muted-foreground">Real-time</span>
-        </div>
-
-        <div className="space-y-4">
-          <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-green-500" />
-              <span className="text-sm text-foreground">Design Team</span>
-            </div>
-            <span className="text-sm font-semibold text-green-600">96%</span>
-          </div>
-
-          <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-blue-500" />
-              <span className="text-sm text-foreground">Engineering</span>
-            </div>
-            <span className="text-sm font-semibold text-blue-600">94%</span>
-          </div>
-
-          <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-purple-500" />
-              <span className="text-sm text-foreground">Product</span>
-            </div>
-            <span className="text-sm font-semibold text-purple-600">92%</span>
-          </div>
-        </div>
-
-        <div className="pt-3 border-t border-border/50">
-          <div className="text-xs text-muted-foreground">
-            <span className="font-semibold text-foreground">12</span> active conversations
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  )
+  return null
 }
 
 const StripeGlobalCard = ({
@@ -554,7 +490,7 @@ const CaseStudiesCarousel = () => {
                   >
                     "{currentStudy.quote}"
                   </p>
-                  
+                  <footer className="text-sm text-muted-foreground">{currentStudy.attribution}</footer>
                 </blockquote>
               </motion.div>
             </AnimatePresence>
