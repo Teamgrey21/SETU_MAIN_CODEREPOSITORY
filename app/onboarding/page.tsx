@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { User, ArrowRight, ArrowLeft } from "lucide-react"
-import { motion } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 import { createClient } from "@/lib/supabase/client"
 
 export default function OnboardingPage() {
@@ -12,6 +12,7 @@ export default function OnboardingPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [userEmail, setUserEmail] = useState("")
   const [userId, setUserId] = useState("")
+  const [validationError, setValidationError] = useState("")
 
   const [formData, setFormData] = useState({
     name: "",
@@ -85,12 +86,131 @@ export default function OnboardingPage() {
     }))
   }
 
+  const validateCurrentStep = (): boolean => {
+    setValidationError("")
+
+    if (step === 1) {
+      if (!formData.name.trim()) {
+        setValidationError("Please enter your name")
+        return false
+      }
+      if (!formData.age.trim()) {
+        setValidationError("Please enter your age")
+        return false
+      }
+      if (!formData.occupation) {
+        setValidationError("Please select your occupation")
+        return false
+      }
+    }
+
+    if (step === 2) {
+      if (!formData.totalIncome.trim()) {
+        setValidationError("Please enter your total income")
+        return false
+      }
+      if (!formData.totalExpenses.trim()) {
+        setValidationError("Please enter your total expenses")
+        return false
+      }
+      if (!formData.savings.trim()) {
+        setValidationError("Please enter your savings")
+        return false
+      }
+      if (!formData.selfInvestment) {
+        setValidationError("Please answer if you invest in yourself")
+        return false
+      }
+    }
+
+    if (step === 3) {
+      if (!formData.sendMoneyToFamily) {
+        setValidationError("Please answer if you send money to family")
+        return false
+      }
+      if (!formData.hasInvestedBefore) {
+        setValidationError("Please answer if you have invested before")
+        return false
+      }
+      if (formData.hasInvestedBefore === "Yes" && formData.investmentTypes.length === 0) {
+        setValidationError("Please select at least one investment type")
+        return false
+      }
+      if (!formData.longTermGoal.trim()) {
+        setValidationError("Please enter your long-term goal")
+        return false
+      }
+      if (!formData.longTermAmount.trim()) {
+        setValidationError("Please enter your long-term goal amount")
+        return false
+      }
+      if (!formData.shortTermGoal.trim()) {
+        setValidationError("Please enter your short-term goal")
+        return false
+      }
+      if (!formData.shortTermAmount.trim()) {
+        setValidationError("Please enter your short-term goal amount")
+        return false
+      }
+      if (!formData.lifePlanningApproach.trim()) {
+        setValidationError("Please share your approach to life planning")
+        return false
+      }
+    }
+
+    return true
+  }
+
+  const calculateProfileCompletion = (): number => {
+    const requiredFields = [
+      // Step 1 - Personal Info (3 fields)
+      formData.name,
+      formData.age,
+      formData.occupation,
+      // Step 2 - Financial Info (4 fields - excluding optional majorAsset and assetValue)
+      formData.totalIncome,
+      formData.totalExpenses,
+      formData.savings,
+      formData.selfInvestment,
+      // Step 3 - Financial Goals/Personality (8 fields - excluding optional likedOnboarding)
+      formData.sendMoneyToFamily,
+      formData.hasInvestedBefore,
+      // Only count investment types if user said "Yes" to investing
+      ...(formData.hasInvestedBefore === "Yes" ? [formData.investmentTypes.length > 0 ? "yes" : ""] : ["N/A"]),
+      formData.longTermGoal,
+      formData.longTermAmount,
+      formData.shortTermGoal,
+      formData.shortTermAmount,
+      formData.lifePlanningApproach,
+    ]
+
+    const completedFields = requiredFields.filter((field) => {
+      if (field === "N/A") return true // Skip investment types if user hasn't invested
+      return field && field.toString().trim() !== ""
+    }).length
+
+    const totalFields = requiredFields.length
+    const percentage = Math.round((completedFields / totalFields) * 100)
+
+    return percentage
+  }
+
   const handleNext = () => {
-    if (step < 4) setStep(step + 1)
+    if (!validateCurrentStep()) {
+      return
+    }
+
+    if (step < 4) {
+      setStep(step + 1)
+      setValidationError("")
+    }
   }
 
   const handlePrevious = () => {
-    if (step > 1) setStep(step - 1)
+    if (step > 1) {
+      setStep(step - 1)
+      setValidationError("")
+    }
   }
 
   const handleComplete = async () => {
@@ -142,7 +262,7 @@ export default function OnboardingPage() {
     }
   }
 
-  const profileCompletion = step === 1 ? 0 : step === 2 ? 27 : step === 3 ? 66 : 100
+  const profileCompletion = calculateProfileCompletion()
 
   return (
     <div className="min-h-screen w-full relative overflow-hidden bg-gradient-to-br from-[#4A9FD8] via-[#5BA8DC] to-[#3D8FC9]">
@@ -286,7 +406,7 @@ export default function OnboardingPage() {
                       <button
                         key={occupation}
                         onClick={() => setFormData({ ...formData, occupation })}
-                        className={`px-6 py-4 rounded-xl text-left transition-all ${
+                        className={`px-6 py-4 rounded-xl transition-all ${
                           formData.occupation === occupation
                             ? "bg-[#4A9FD8] text-white shadow-md"
                             : "bg-[#f0f0f0] text-[#202020] hover:bg-[#e5e5e5]"
@@ -535,7 +655,13 @@ export default function OnboardingPage() {
                       {["Yes", "No"].map((option) => (
                         <button
                           key={option}
-                          onClick={() => setFormData({ ...formData, hasInvestedBefore: option })}
+                          onClick={() => {
+                            setFormData({
+                              ...formData,
+                              hasInvestedBefore: option,
+                              investmentTypes: option === "No" ? [] : formData.investmentTypes,
+                            })
+                          }}
                           className={`flex-1 px-6 py-4 rounded-xl transition-all font-medium ${
                             formData.hasInvestedBefore === option
                               ? "bg-white text-[#1a1a1a] shadow-md"
@@ -550,36 +676,41 @@ export default function OnboardingPage() {
                   </motion.div>
                 </div>
 
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.3 }}
-                  className="bg-[#1a1a1a]/95 backdrop-blur-sm rounded-3xl p-8 shadow-lg mb-6"
-                >
-                  <h3
-                    className="text-lg font-medium text-white mb-2"
-                    style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                  >
-                    What types of investments have you made?
-                  </h3>
-                  <p className="text-sm text-white/60 mb-6">Select all that apply</p>
-                  <div className="grid grid-cols-4 gap-4">
-                    {investmentTypes.map((type) => (
-                      <button
-                        key={type}
-                        onClick={() => toggleInvestmentType(type)}
-                        className={`px-4 py-4 rounded-xl transition-all text-center ${
-                          formData.investmentTypes.includes(type)
-                            ? "bg-white text-[#1a1a1a] shadow-md"
-                            : "bg-[#3a3a3a] text-white hover:bg-[#4a4a4a]"
-                        }`}
+                <AnimatePresence>
+                  {formData.hasInvestedBefore === "Yes" && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, height: "auto", scale: 1 }}
+                      exit={{ opacity: 0, height: 0, scale: 0.95 }}
+                      transition={{ duration: 0.3 }}
+                      className="bg-[#1a1a1a]/95 backdrop-blur-sm rounded-3xl p-8 shadow-lg mb-6 overflow-hidden"
+                    >
+                      <h3
+                        className="text-lg font-medium text-white mb-2"
                         style={{ fontFamily: "var(--font-figtree), Figtree" }}
                       >
-                        {type}
-                      </button>
-                    ))}
-                  </div>
-                </motion.div>
+                        What types of investments have you made?
+                      </h3>
+                      <p className="text-sm text-white/60 mb-6">Select all that apply</p>
+                      <div className="grid grid-cols-4 gap-4">
+                        {investmentTypes.map((type) => (
+                          <button
+                            key={type}
+                            onClick={() => toggleInvestmentType(type)}
+                            className={`px-4 py-4 rounded-xl transition-all text-center ${
+                              formData.investmentTypes.includes(type)
+                                ? "bg-white text-[#1a1a1a] shadow-md"
+                                : "bg-[#3a3a3a] text-white hover:bg-[#4a4a4a]"
+                            }`}
+                            style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                          >
+                            {type}
+                          </button>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
@@ -708,6 +839,21 @@ export default function OnboardingPage() {
               </div>
             )}
           </motion.div>
+
+          <AnimatePresence>
+            {validationError && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="w-full max-w-4xl mb-4"
+              >
+                <div className="bg-red-500/90 backdrop-blur-sm text-white px-6 py-4 rounded-2xl shadow-lg text-center font-medium">
+                  {validationError}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
