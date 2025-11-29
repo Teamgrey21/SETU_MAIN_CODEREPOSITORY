@@ -10,7 +10,7 @@ Finance SETU is your personal financial guide that simplifies complex money matt
 - **Startup Filing Assistance**: Simplified startup registration and compliance
 - **Financial Education**: Learn while you manage your finances
 
-##Try [financesetu.teamgrey.dev]
+## Try [financesetu.teamgrey.dev]
 
 ## About
 Prototype Project for Mumbai Hacks
