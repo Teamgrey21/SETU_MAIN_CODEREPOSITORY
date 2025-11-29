@@ -18,8 +18,10 @@ export const AuthSection = () => {
 
   const handleGoogleAuth = async () => {
     try {
+      console.log("[v0] Initiating Google OAuth flow")
       const supabase = createClient()
-      const { error } = await supabase.auth.signInWithOAuth({
+
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
@@ -31,10 +33,14 @@ export const AuthSection = () => {
       })
 
       if (error) {
+        console.error("[v0] Google OAuth error:", error)
         setError(error.message)
+      } else {
+        console.log("[v0] Google OAuth initiated successfully")
       }
     } catch (err) {
-      setError("Failed to sign in with Google")
+      console.error("[v0] Google OAuth exception:", err)
+      setError("Failed to sign in with Google. Please try again.")
     }
   }
 

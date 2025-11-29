@@ -640,9 +640,32 @@ export default function UserSectionPage() {
       }
 
       const data = await response.json()
-      console.log("[v0] Received response from n8n:", data)
+      console.log("[v0] Received response from n8n:", JSON.stringify(data, null, 2))
 
-      const botMessage = data.response || data.message || data.output || "I received your message."
+      let botMessage =
+        data.response ||
+        data.message ||
+        data.output ||
+        data.text ||
+        data.answer ||
+        data.reply ||
+        data.result ||
+        data.ai_response ||
+        (typeof data === "string" ? data : null)
+
+      if (!botMessage && typeof data === "object") {
+        const firstKey = Object.keys(data)[0]
+        if (firstKey && typeof data[firstKey] === "string") {
+          botMessage = data[firstKey]
+          console.log("[v0] Extracted response from field:", firstKey)
+        }
+      }
+
+      if (!botMessage) {
+        botMessage = "I received your message, but the response format was unexpected."
+        console.log("[v0] No recognized response field found. Available fields:", Object.keys(data))
+      }
+
       setMessages((prev) => [...prev, { type: "bot", text: botMessage }])
     } catch (error) {
       console.error("[v0] Error calling n8n webhook:", error)
@@ -688,10 +711,32 @@ export default function UserSectionPage() {
       }
 
       const data = await response.json()
-      console.log("[v0] Received response from Teach Easy n8n:", data)
+      console.log("[v0] Received response from Teach Easy n8n:", JSON.stringify(data, null, 2))
 
-      const botMessage =
-        data.response || data.message || data.output || "I'm here to help you learn about personal finance!"
+      let botMessage =
+        data.response ||
+        data.message ||
+        data.output ||
+        data.text ||
+        data.answer ||
+        data.reply ||
+        data.result ||
+        data.ai_response ||
+        (typeof data === "string" ? data : null)
+
+      if (!botMessage && typeof data === "object") {
+        const firstKey = Object.keys(data)[0]
+        if (firstKey && typeof data[firstKey] === "string") {
+          botMessage = data[firstKey]
+          console.log("[v0] Extracted Teach Easy response from field:", firstKey)
+        }
+      }
+
+      if (!botMessage) {
+        botMessage = "I'm here to help you learn about personal finance!"
+        console.log("[v0] No recognized response field found. Available fields:", Object.keys(data))
+      }
+
       setTeachEasyMessages((prev) => [...prev, { type: "bot", text: botMessage }])
     } catch (error) {
       console.error("[v0] Error calling Teach Easy n8n webhook:", error)

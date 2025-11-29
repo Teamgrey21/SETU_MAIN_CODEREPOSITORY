@@ -11,8 +11,13 @@ export async function GET(request: Request) {
 
     const { data, error } = await supabase.auth.exchangeCodeForSession(code)
 
-    if (!error && data.user) {
-      console.log("[v0] User confirmed email:", data.user.email)
+    if (error) {
+      console.error("[v0] Error exchanging code for session:", error)
+      return NextResponse.redirect(`${origin}/auth/error?error=${encodeURIComponent(error.message)}`)
+    }
+
+    if (data.user) {
+      console.log("[v0] User authenticated:", data.user.email, "Provider:", data.user.app_metadata.provider)
 
       try {
         await supabase.from("login_details").insert({
@@ -26,11 +31,15 @@ export async function GET(request: Request) {
         console.error("[v0] Error inserting login details:", err)
       }
 
-      const { data: onboardingData } = await supabase
+      const { data: onboardingData, error: onboardingError } = await supabase
         .from("user_onboarding_information")
         .select("id")
         .eq("user_id", data.user.id)
-        .single()
+        .maybeSingle()
+
+      if (onboardingError) {
+        console.error("[v0] Error checking onboarding status:", onboardingError)
+      }
 
       if (onboardingData) {
         console.log("[v0] User has completed onboarding, redirecting to user-section")
@@ -42,6 +51,6 @@ export async function GET(request: Request) {
     }
   }
 
-  // Return error if something went wrong
-  return NextResponse.redirect(`${origin}/auth/error`)
+  console.error("[v0] No authorization code found in callback")
+  return NextResponse.redirect(`${origin}/auth/error?error=no_code`)
 }
