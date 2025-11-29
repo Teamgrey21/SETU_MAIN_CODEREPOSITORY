@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import {
   Home,
@@ -27,8 +27,9 @@ import {
   User,
   Newspaper,
   Trash2,
-  LogOut,
 } from "lucide-react"
+
+import { createClient } from "@/lib/supabase/client"
 
 export default function UserSectionPage() {
   const router = useRouter()
@@ -37,6 +38,127 @@ export default function UserSectionPage() {
   const [inputValue, setInputValue] = useState("")
   const [isProcessing, setIsProcessing] = useState(false)
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
+
+  const [userData, setUserData] = useState<any>(null)
+  const [isLoadingData, setIsLoadingData] = useState(true)
+  const [userEmail, setUserEmail] = useState("")
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const supabase = createClient()
+
+        // Get current user
+        const {
+          data: { user },
+          error: authError,
+        } = await supabase.auth.getUser()
+
+        if (authError || !user) {
+          console.log("[v0] No authenticated user, redirecting to landing page")
+          router.push("/")
+          return
+        }
+
+        setUserEmail(user.email || "")
+
+        // Fetch onboarding data
+        const { data: onboardingData, error: onboardingError } = await supabase
+          .from("user_onboarding_information")
+          .select("*")
+          .eq("email", user.email)
+          .single()
+
+        if (onboardingError) {
+          console.error("[v0] Error fetching onboarding data:", onboardingError)
+          setIsLoadingData(false)
+          return
+        }
+
+        if (onboardingData) {
+          console.log("[v0] Onboarding data fetched successfully:", onboardingData)
+          setUserData(onboardingData)
+
+          setSettingsData({
+            name: onboardingData.name || "",
+            age: onboardingData.age?.toString() || "",
+            occupation: onboardingData.occupation || "",
+            totalIncome: onboardingData.income_per_month?.toString() || "",
+            totalExpenses: onboardingData.expenses_per_month?.toString() || "",
+            savings: onboardingData.savings_per_month?.toString() || "",
+            majorAsset: onboardingData.major_assets || "",
+            assetValue: onboardingData.assets_value?.toString() || "",
+            investmentTypes: onboardingData.investment_types
+              ? onboardingData.investment_types.split(",").map((t: string) => t.trim())
+              : [],
+            longTermGoal: onboardingData.long_term_goals || "",
+            longTermAmount: onboardingData.long_term_goals_value?.toString() || "",
+            shortTermGoal: onboardingData.short_term_goals || "",
+            shortTermAmount: onboardingData.short_term_goals_value?.toString() || "",
+            lifePlanningApproach: onboardingData.approach_to_life_planning || "",
+          })
+        }
+
+        setIsLoadingData(false)
+      } catch (error) {
+        console.error("[v0] Error in fetchUserData:", error)
+        setIsLoadingData(false)
+      }
+    }
+
+    fetchUserData()
+  }, [router])
+
+  const handleSaveSettings = async () => {
+    try {
+      const supabase = createClient()
+
+      const updateData = {
+        name: settingsData.name,
+        age: Number.parseInt(settingsData.age) || null,
+        occupation: settingsData.occupation,
+        income_per_month: Number.parseFloat(settingsData.totalIncome) || null,
+        expenses_per_month: Number.parseFloat(settingsData.totalExpenses) || null,
+        savings_per_month: Number.parseFloat(settingsData.savings) || null,
+        major_assets: settingsData.majorAsset,
+        assets_value: Number.parseFloat(settingsData.assetValue) || null,
+        investment_types: settingsData.investmentTypes.join(", "),
+        long_term_goals: settingsData.longTermGoal,
+        long_term_goals_value: Number.parseFloat(settingsData.longTermAmount) || null,
+        short_term_goals: settingsData.shortTermGoal,
+        short_term_goals_value: Number.parseFloat(settingsData.shortTermAmount) || null,
+        approach_to_life_planning: settingsData.lifePlanningApproach,
+        updated_at: new Date().toISOString(),
+      }
+
+      const { error } = await supabase.from("user_onboarding_information").update(updateData).eq("email", userEmail)
+
+      if (error) {
+        console.error("[v0] Error updating settings:", error)
+        alert("Error saving settings. Please try again.")
+        return
+      }
+
+      console.log("[v0] Settings updated successfully")
+      alert("Settings saved successfully!")
+
+      // Refresh user data
+      setUserData({ ...userData, ...updateData })
+    } catch (error) {
+      console.error("[v0] Error in handleSaveSettings:", error)
+      alert("Error saving settings. Please try again.")
+    }
+  }
+
+  const handleLogout = async () => {
+    try {
+      const supabase = createClient()
+      await supabase.auth.signOut()
+      router.push("/")
+    } catch (error) {
+      console.error("[v0] Error during logout:", error)
+    }
+  }
 
   const [settingsData, setSettingsData] = useState({
     name: "Abby Cooper",
@@ -314,27 +436,61 @@ export default function UserSectionPage() {
                 >
                   User Profile
                 </h2>
-                <div className="flex flex-col gap-6">
-                  {/* Avatar */}
-                  <div className="w-20 h-20 bg-[#f3f4f6] rounded-full flex items-center justify-center mx-auto">
-                    <User className="w-10 h-10 text-[#6b7280]" />
+                {isLoadingData ? (
+                  <div className="flex items-center justify-center h-40">
+                    <p className="text-[#6b7280]">Loading profile...</p>
                   </div>
+                ) : userData ? (
+                  <div className="flex flex-col gap-6">
+                    {/* Avatar */}
+                    <div className="w-20 h-20 bg-[#f3f4f6] rounded-full flex items-center justify-center mx-auto">
+                      <User className="w-10 h-10 text-[#6b7280]" />
+                    </div>
 
-                  {/* User Details */}
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
+                    {/* User Details */}
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <p
+                            className="text-sm text-[#6b7280] mb-1"
+                            style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                          >
+                            Name
+                          </p>
+                          <p
+                            className="text-base font-medium text-[#202020]"
+                            style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                          >
+                            {userData.name || "Not provided"}
+                          </p>
+                        </div>
+                        <div>
+                          <p
+                            className="text-sm text-[#6b7280] mb-1"
+                            style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                          >
+                            Age
+                          </p>
+                          <p
+                            className="text-base font-medium text-[#202020]"
+                            style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                          >
+                            {userData.age || "Not provided"}
+                          </p>
+                        </div>
+                      </div>
                       <div>
                         <p
                           className="text-sm text-[#6b7280] mb-1"
                           style={{ fontFamily: "var(--font-figtree), Figtree" }}
                         >
-                          Name
+                          Occupation
                         </p>
                         <p
                           className="text-base font-medium text-[#202020]"
                           style={{ fontFamily: "var(--font-figtree), Figtree" }}
                         >
-                          Abby Cooper
+                          {userData.occupation || "Not provided"}
                         </p>
                       </div>
                       <div>
@@ -342,40 +498,42 @@ export default function UserSectionPage() {
                           className="text-sm text-[#6b7280] mb-1"
                           style={{ fontFamily: "var(--font-figtree), Figtree" }}
                         >
-                          Date of Joining
+                          Email
                         </p>
                         <p
                           className="text-base font-medium text-[#202020]"
                           style={{ fontFamily: "var(--font-figtree), Figtree" }}
                         >
-                          July 25, 2018
+                          {userData.email || userEmail}
                         </p>
                       </div>
-                    </div>
-                    <div>
-                      <p className="text-sm text-[#6b7280] mb-1" style={{ fontFamily: "var(--font-figtree), Figtree" }}>
-                        Material Status
-                      </p>
-                      <p
-                        className="text-base font-medium text-[#202020]"
-                        style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                      >
-                        Married
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-[#6b7280] mb-1" style={{ fontFamily: "var(--font-figtree), Figtree" }}>
-                        Address
-                      </p>
-                      <p
-                        className="text-base font-medium text-[#202020]"
-                        style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                      >
-                        7529 E Pecan St. Portland Illinois 29125 United States
-                      </p>
+                      <div>
+                        <p
+                          className="text-sm text-[#6b7280] mb-1"
+                          style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                        >
+                          Monthly Income
+                        </p>
+                        <p
+                          className="text-base font-medium text-[#202020]"
+                          style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                        >
+                          ₹{userData.income_per_month?.toLocaleString() || "Not provided"}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-40 gap-4">
+                    <p className="text-[#6b7280]">No profile data found</p>
+                    <button
+                      onClick={() => router.push("/onboarding")}
+                      className="px-4 py-2 bg-[#202020] text-white rounded-lg hover:bg-[#404040] transition-colors"
+                    >
+                      Complete Onboarding
+                    </button>
+                  </div>
+                )}
               </div>
 
               {/* Ask Setu Interface Card */}
@@ -1548,23 +1706,17 @@ export default function UserSectionPage() {
               {/* Action Buttons */}
               <div className="flex items-center justify-between gap-4 pt-4">
                 <button
-                  onClick={() => {
-                    // Save settings logic here
-                    alert("Settings saved successfully!")
-                  }}
+                  onClick={handleSaveSettings}
                   className="flex-1 px-6 py-3 bg-[#202020] text-white rounded-xl hover:bg-[#404040] transition-colors font-medium"
                   style={{ fontFamily: "var(--font-figtree), Figtree" }}
                 >
                   Save Changes
                 </button>
                 <button
-                  onClick={() => {
-                    window.location.href = "/landing"
-                  }}
-                  className="px-6 py-3 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-colors font-medium flex items-center gap-2"
+                  onClick={handleLogout}
+                  className="px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors font-medium"
                   style={{ fontFamily: "var(--font-figtree), Figtree" }}
                 >
-                  <LogOut className="w-5 h-5" />
                   Logout
                 </button>
               </div>
