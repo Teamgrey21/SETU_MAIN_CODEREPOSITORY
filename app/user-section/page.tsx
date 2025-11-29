@@ -21,9 +21,6 @@ import {
   Copy,
   Link2,
   Plus,
-  TrendingUp,
-  TrendingDown,
-  Wallet,
   User,
   Newspaper,
   Trash2,
@@ -625,21 +622,18 @@ export default function UserSectionPage() {
     try {
       console.log("[v0] Sending message to n8n webhook:", userMessage)
 
-      const response = await fetch(
-        "https://finance-setu.app.n8n.cloud/webhook/fdce938b-83d1-49e0-9cc6-79b8d9c2ea4a/chat",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            message: userMessage,
-            user_id: userId,
-            session_id: sessionId,
-            timestamp: new Date().toISOString(),
-          }),
+      const response = await fetch("https://finance-setu.app.n8n.cloud/webhook/chat-ai-agent", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      )
+        body: JSON.stringify({
+          message: userMessage,
+          user_id: userId,
+          session_id: sessionId,
+          timestamp: new Date().toISOString(),
+        }),
+      })
 
       if (!response.ok) {
         throw new Error(`API request failed with status ${response.status}`)
@@ -676,21 +670,18 @@ export default function UserSectionPage() {
     try {
       console.log("[v0] Sending message to Teach Easy n8n webhook:", userMessage)
 
-      const response = await fetch(
-        "https://finance-setu.app.n8n.cloud/webhook/fdce938b-83d1-49e0-9cc6-79b8d9c2ea4a/teach",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            message: userMessage,
-            user_id: userId,
-            session_id: sessionId,
-            timestamp: new Date().toISOString(),
-          }),
+      const response = await fetch("https://finance-setu.app.n8n.cloud/webhook/chat-ai-agent", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      )
+        body: JSON.stringify({
+          message: userMessage,
+          user_id: userId,
+          session_id: sessionId,
+          timestamp: new Date().toISOString(),
+        }),
+      })
 
       if (!response.ok) {
         throw new Error(`API request failed with status ${response.status}`)
@@ -1057,80 +1048,6 @@ export default function UserSectionPage() {
               </div>
             ) : analysisData ? (
               <>
-                <div className="grid grid-cols-4 gap-6">
-                  <div className="bg-white border border-[#e5e5e5] rounded-2xl p-6">
-                    <div className="flex items-center gap-2 mb-2">
-                      <TrendingUp className="w-5 h-5 text-blue-500" />
-                      <h3
-                        className="text-sm font-medium text-[#6b7280]"
-                        style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                      >
-                        Credit Risk
-                      </h3>
-                    </div>
-                    <p
-                      className="text-3xl font-bold text-[#202020]"
-                      style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                    >
-                      {analysisData.risk_credit}%
-                    </p>
-                  </div>
-
-                  <div className="bg-white border border-[#e5e5e5] rounded-2xl p-6">
-                    <div className="flex items-center gap-2 mb-2">
-                      <TrendingDown className="w-5 h-5 text-red-500" />
-                      <h3
-                        className="text-sm font-medium text-[#6b7280]"
-                        style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                      >
-                        Market Risk
-                      </h3>
-                    </div>
-                    <p
-                      className="text-3xl font-bold text-[#202020]"
-                      style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                    >
-                      {analysisData.risk_market}%
-                    </p>
-                  </div>
-
-                  <div className="bg-white border border-[#e5e5e5] rounded-2xl p-6">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Wallet className="w-5 h-5 text-green-500" />
-                      <h3
-                        className="text-sm font-medium text-[#6b7280]"
-                        style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                      >
-                        Liquidity Risk
-                      </h3>
-                    </div>
-                    <p
-                      className="text-3xl font-bold text-[#202020]"
-                      style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                    >
-                      {analysisData.risk_liquidity}%
-                    </p>
-                  </div>
-
-                  <div className="bg-white border border-[#e5e5e5] rounded-2xl p-6">
-                    <div className="flex items-center gap-2 mb-2">
-                      <BarChart3 className="w-5 h-5 text-orange-500" />
-                      <h3
-                        className="text-sm font-medium text-[#6b7280]"
-                        style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                      >
-                        Operational Risk
-                      </h3>
-                    </div>
-                    <p
-                      className="text-3xl font-bold text-[#202020]"
-                      style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                    >
-                      {analysisData.risk_operational}%
-                    </p>
-                  </div>
-                </div>
-
                 <div className="bg-white border border-[#e5e5e5] rounded-2xl p-6">
                   <h2
                     className="text-lg font-semibold text-[#6b7280] mb-6"
