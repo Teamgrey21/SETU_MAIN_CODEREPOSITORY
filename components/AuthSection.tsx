@@ -23,6 +23,10 @@ export const AuthSection = () => {
         provider: "google",
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            access_type: "offline",
+            prompt: "consent",
+          },
         },
       })
 
@@ -102,7 +106,19 @@ export const AuthSection = () => {
             console.error("[v0] Error saving login details:", loginErr)
           }
 
-          router.push("/onboarding")
+          const { data: onboardingData } = await supabase
+            .from("user_onboarding_information")
+            .select("id")
+            .eq("user_id", data.user.id)
+            .single()
+
+          if (onboardingData) {
+            console.log("[v0] User has completed onboarding, redirecting to user-section")
+            router.push("/user-section")
+          } else {
+            console.log("[v0] User has not completed onboarding, redirecting to onboarding")
+            router.push("/onboarding")
+          }
         } else {
           throw new Error("Signin failed: No user returned")
         }

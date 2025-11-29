@@ -19,22 +19,22 @@ type DataPoint = {
 const stats: StatItem[] = [
   {
     value: "1B+",
-    description: "Messages analyzed\ndaily",
+    description: "Help with filling\nTaxes",
     delay: 0,
   },
   {
     value: "99.9%",
-    description: "Accuracy in tone\ndetection",
+    description: "Confusion Educational\nLoans",
     delay: 0.2,
   },
   {
     value: "50+",
-    description: "Languages supported\nworldwide",
+    description: "Difficulty managing emergency\nfunds or savings",
     delay: 0.4,
   },
   {
     value: "1000+",
-    description: "Organizations using\nFinance SETU",
+    description: "Overwhelmed by your\nEMI payments",
     delay: 0.6,
   },
 ]
