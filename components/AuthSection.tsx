@@ -14,9 +14,24 @@ export const AuthSection = () => {
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [mode, setMode] = useState<"signup" | "signin">("signup")
 
-  const handleGoogleAuth = () => {
-    router.push("/onboarding")
+  const handleGoogleAuth = async () => {
+    try {
+      const supabase = createClient()
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      })
+
+      if (error) {
+        setError(error.message)
+      }
+    } catch (err) {
+      setError("Failed to sign in with Google")
+    }
   }
 
   const handleEmailAuth = async (e: React.FormEvent) => {
@@ -24,28 +39,88 @@ export const AuthSection = () => {
     setIsLoading(true)
     setError(null)
 
-    try {
-      const supabase = createClient()
-
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL || `${window.location.origin}/onboarding`,
-          data: {
-            email: email,
-          },
-        },
-      })
-
-      if (signUpError) throw signUpError
-
-      setShowConfirmation(true)
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "An error occurred during signup")
-      console.error("[v0] Signup error:", err)
-    } finally {
+    if (mode === "signup" && password.length < 6) {
+      setError("Password must be at least 6 characters long")
       setIsLoading(false)
+      return
+    }
+
+    if (mode === "signup") {
+      try {
+        const supabase = createClient()
+
+        const { data, error: signUpError } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo:
+              process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL || `${window.location.origin}/auth/callback`,
+            data: {
+              email: email,
+            },
+          },
+        })
+
+        if (signUpError) {
+          throw signUpError
+        }
+
+        if (data.user) {
+          setShowConfirmation(true)
+        } else {
+          throw new Error("Signup failed: No user returned")
+        }
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : "An error occurred during signup"
+        setError(errorMessage)
+      } finally {
+        setIsLoading(false)
+      }
+    } else {
+      try {
+        const supabase = createClient()
+
+        const { data, error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        })
+
+        if (signInError) {
+          throw signInError
+        }
+
+        if (data.user && data.session) {
+          try {
+            await supabase.from("login_details").insert({
+              user_id: data.user.id,
+              email: data.user.email,
+              login_type: "email",
+              login_session_id: data.session.access_token,
+              login_session_start_time: new Date().toISOString(),
+            })
+          } catch (loginErr) {
+            console.error("[v0] Error saving login details:", loginErr)
+          }
+
+          router.push("/onboarding")
+        } else {
+          throw new Error("Signin failed: No user returned")
+        }
+      } catch (err: unknown) {
+        let errorMessage = "An error occurred during signin"
+        if (err instanceof Error) {
+          if (err.message.includes("Invalid login credentials")) {
+            errorMessage = "Invalid email or password"
+          } else if (err.message.includes("Email not confirmed")) {
+            errorMessage = "Please confirm your email before signing in"
+          } else {
+            errorMessage = err.message
+          }
+        }
+        setError(errorMessage)
+      } finally {
+        setIsLoading(false)
+      }
     }
   }
 
@@ -96,7 +171,10 @@ export const AuthSection = () => {
               >
                 Have an account?{" "}
                 <button
-                  onClick={() => setShowConfirmation(false)}
+                  onClick={() => {
+                    setShowConfirmation(false)
+                    setMode("signin")
+                  }}
                   className="text-[#202020] font-medium hover:underline"
                 >
                   Sign In Now
@@ -109,7 +187,7 @@ export const AuthSection = () => {
                 className="text-3xl md:text-4xl font-medium text-[#202020] text-center mb-8"
                 style={{ fontFamily: "var(--font-figtree), Figtree" }}
               >
-                Get Started with Finance Setu
+                {mode === "signup" ? "Get Started with Finance Setu" : "Welcome Back to Finance Setu"}
               </h2>
 
               <div className="flex flex-col lg:flex-row items-center justify-center gap-6 lg:gap-8">
@@ -165,11 +243,20 @@ export const AuthSection = () => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
+                      minLength={6}
                       disabled={isLoading}
                       className="px-4 py-3 bg-white/80 backdrop-blur-sm rounded-xl border border-[#e5e5e5] focus:border-[#404040] focus:outline-none transition-colors duration-200 text-[#202020] placeholder:text-[#9a9a9a] text-sm w-full sm:w-auto sm:min-w-[200px] disabled:opacity-50 disabled:cursor-not-allowed"
                       style={{ fontFamily: "var(--font-figtree), Figtree" }}
                     />
                   </div>
+                  {mode === "signup" && password.length > 0 && password.length < 6 && (
+                    <p
+                      className="text-xs text-[#9a9a9a] text-center"
+                      style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                    >
+                      Password must be at least 6 characters
+                    </p>
+                  )}
                   {error && (
                     <p
                       className="text-red-500 text-xs text-center"
@@ -184,7 +271,7 @@ export const AuthSection = () => {
                     className="px-6 py-3 bg-[#202020] hover:bg-[#404040] text-white rounded-xl transition-colors duration-200 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                     style={{ fontFamily: "var(--font-figtree), Figtree" }}
                   >
-                    {isLoading ? "Signing up..." : "Continue"}
+                    {isLoading ? (mode === "signup" ? "Signing up..." : "Signing in...") : "Continue"}
                   </button>
                 </form>
               </div>
@@ -193,7 +280,33 @@ export const AuthSection = () => {
                 className="text-center mt-6 text-sm text-[#404040]"
                 style={{ fontFamily: "var(--font-figtree), Figtree" }}
               >
-                Already have an account? <button className="text-[#202020] font-medium hover:underline">Sign In</button>
+                {mode === "signup" ? (
+                  <>
+                    Already have an account?{" "}
+                    <button
+                      onClick={() => {
+                        setMode("signin")
+                        setError(null)
+                      }}
+                      className="text-[#202020] font-medium hover:underline"
+                    >
+                      Sign In
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    Don't have an account?{" "}
+                    <button
+                      onClick={() => {
+                        setMode("signup")
+                        setError(null)
+                      }}
+                      className="text-[#202020] font-medium hover:underline"
+                    >
+                      Sign Up
+                    </button>
+                  </>
+                )}
               </p>
             </>
           )}
