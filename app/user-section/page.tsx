@@ -31,6 +31,53 @@ import {
 
 import { createClient } from "@/lib/supabase/client"
 
+interface NewsItem {
+  id: string
+  title: string
+  source: string
+  url: string
+  time_ago: string
+  published_at: string
+}
+
+interface ChatConversation {
+  id: string
+  session_id: string
+  title: string
+  description: string | null
+  original_url: string | null
+  short_url: string | null
+  avatar_text: string
+  avatar_color: string
+  message_count: number
+  created_at: string
+  updated_at: string
+}
+
+interface FinancialSummary {
+  id: string
+  report_name: string
+  report_type: string | null
+  description: string | null
+  full_url: string | null
+  avatar_text: string
+  avatar_color: string
+  file_path: string | null
+  created_at: string
+}
+
+interface AnalysisData {
+  id: string
+  risk_credit: number
+  risk_market: number
+  risk_liquidity: number
+  risk_operational: number
+  monthly_income: number
+  monthly_expenses: number
+  monthly_savings: number
+  updated_at: string
+}
+
 export default function UserSectionPage() {
   const router = useRouter()
   const [activeSection, setActiveSection] = useState("Home")
@@ -42,9 +89,19 @@ export default function UserSectionPage() {
   const [userData, setUserData] = useState<any>(null)
   const [isLoadingData, setIsLoadingData] = useState(true)
   const [userEmail, setUserEmail] = useState("")
+  const [userId, setUserId] = useState("")
+
+  const [newsItems, setNewsItems] = useState<NewsItem[]>([])
+  const [chatHistory, setChatHistory] = useState<ChatConversation[]>([])
+  const [financialSummaries, setFinancialSummaries] = useState<FinancialSummary[]>([])
+  const [analysisData, setAnalysisData] = useState<AnalysisData | null>(null)
+  const [isLoadingNews, setIsLoadingNews] = useState(true)
+  const [isLoadingChats, setIsLoadingChats] = useState(true)
+  const [isLoadingSummaries, setIsLoadingSummaries] = useState(true)
+  const [isLoadingAnalysis, setIsLoadingAnalysis] = useState(true)
 
   useEffect(() => {
-    const fetchUserData = async () => {
+    const fetchAllData = async () => {
       try {
         const supabase = createClient()
 
@@ -61,6 +118,7 @@ export default function UserSectionPage() {
         }
 
         setUserEmail(user.email || "")
+        setUserId(user.id)
 
         // Fetch onboarding data
         const { data: onboardingData, error: onboardingError } = await supabase
@@ -71,12 +129,8 @@ export default function UserSectionPage() {
 
         if (onboardingError) {
           console.error("[v0] Error fetching onboarding data:", onboardingError)
-          setIsLoadingData(false)
-          return
-        }
-
-        if (onboardingData) {
-          console.log("[v0] Onboarding data fetched successfully:", onboardingData)
+        } else if (onboardingData) {
+          console.log("[v0] Onboarding data fetched successfully")
           setUserData(onboardingData)
 
           setSettingsData({
@@ -97,17 +151,271 @@ export default function UserSectionPage() {
             shortTermAmount: onboardingData.short_term_goals_value?.toString() || "",
             lifePlanningApproach: onboardingData.approach_to_life_planning || "",
           })
+
+          // Initialize analysis data if it doesn't exist
+          await initializeAnalysisData(supabase, user.id, onboardingData)
         }
 
         setIsLoadingData(false)
+
+        // Fetch news feed
+        await fetchNewsItems(supabase, user.id)
+
+        // Fetch chat history
+        await fetchChatHistory(supabase, user.id)
+
+        // Fetch financial summaries
+        await fetchFinancialSummaries(supabase, user.id)
+
+        // Fetch analysis data
+        await fetchAnalysisData(supabase, user.id)
       } catch (error) {
-        console.error("[v0] Error in fetchUserData:", error)
+        console.error("[v0] Error in fetchAllData:", error)
         setIsLoadingData(false)
       }
     }
 
-    fetchUserData()
+    fetchAllData()
   }, [router])
+
+  const initializeAnalysisData = async (supabase: any, userId: string, onboardingData: any) => {
+    try {
+      const { data: existing, error: fetchError } = await supabase
+        .from("user_analysis_data")
+        .select("*")
+        .eq("user_id", userId)
+        .maybeSingle()
+
+      if (fetchError) {
+        console.error("[v0] Error checking analysis data:", fetchError)
+        return
+      }
+
+      if (!existing) {
+        const initialData = {
+          user_id: userId,
+          risk_credit: 65,
+          risk_market: 45,
+          risk_liquidity: 80,
+          risk_operational: 55,
+          monthly_income: onboardingData.income_per_month || 0,
+          monthly_expenses: onboardingData.expenses_per_month || 0,
+          monthly_savings: onboardingData.savings_per_month || 0,
+        }
+
+        const { error: insertError } = await supabase.from("user_analysis_data").insert([initialData])
+
+        if (insertError) {
+          console.error("[v0] Error inserting analysis data:", insertError)
+        } else {
+          console.log("[v0] Initialized analysis data")
+        }
+      }
+    } catch (error) {
+      console.error("[v0] Error initializing analysis data:", error)
+    }
+  }
+
+  const fetchNewsItems = async (supabase: any, userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("news_feed")
+        .select("*")
+        .eq("user_id", userId)
+        .order("published_at", { ascending: false })
+        .limit(10)
+
+      if (error) throw error
+
+      if (data && data.length > 0) {
+        setNewsItems(data)
+      } else {
+        // Initialize with sample news if none exists
+        const sampleNews = [
+          {
+            user_id: userId,
+            title: "RBI announces new monetary policy decisions for Q4 2024",
+            source: "Google News",
+            url: "https://news.google.com",
+            time_ago: "2h ago",
+          },
+          {
+            user_id: userId,
+            title: "New tax regulations for startups in India announced",
+            source: "Economic Times",
+            url: "https://economictimes.com",
+            time_ago: "5h ago",
+          },
+          {
+            user_id: userId,
+            title: "Stock market hits all-time high amid economic recovery",
+            source: "Google News",
+            url: "https://news.google.com",
+            time_ago: "8h ago",
+          },
+        ]
+
+        const { data: inserted } = await supabase.from("news_feed").insert(sampleNews).select()
+        if (inserted) setNewsItems(inserted)
+      }
+    } catch (error) {
+      console.error("[v0] Error fetching news:", error)
+    } finally {
+      setIsLoadingNews(false)
+    }
+  }
+
+  const fetchChatHistory = async (supabase: any, userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("chat_conversations")
+        .select("*")
+        .eq("user_id", userId)
+        .order("updated_at", { ascending: false })
+
+      if (error) throw error
+
+      if (data && data.length > 0) {
+        setChatHistory(data)
+      } else {
+        // Initialize with sample chat history
+        const sampleChats = [
+          {
+            user_id: userId,
+            session_id: crypto.randomUUID(),
+            title: "How to calculate EMI?",
+            description: "EMI calculation query",
+            original_url: "financesetu.com/chats",
+            short_url: "chat.setu/hKWhPa",
+            avatar_text: "FS",
+            avatar_color: "bg-blue-500",
+            message_count: 27,
+          },
+          {
+            user_id: userId,
+            session_id: crypto.randomUUID(),
+            title: "Investment tax advice",
+            description: "Tax planning discussion",
+            original_url: "financesetu.com/investments",
+            short_url: "chat.setu/1SnIPc",
+            avatar_text: "FS",
+            avatar_color: "bg-blue-500",
+            message_count: 48,
+          },
+        ]
+
+        const { data: inserted } = await supabase.from("chat_conversations").insert(sampleChats).select()
+        if (inserted) setChatHistory(inserted)
+      }
+    } catch (error) {
+      console.error("[v0] Error fetching chat history:", error)
+    } finally {
+      setIsLoadingChats(false)
+    }
+  }
+
+  const fetchFinancialSummaries = async (supabase: any, userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("financial_summaries")
+        .select("*")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false })
+
+      if (error) throw error
+
+      if (data && data.length > 0) {
+        setFinancialSummaries(data)
+      } else {
+        // Initialize with sample summaries
+        const sampleSummaries = [
+          {
+            user_id: userId,
+            report_name: "Q4 2024 Financial Summary",
+            report_type: "Quarterly Report",
+            description: "Detailed breakdown of income, expenses, and savings for Q4 2024",
+            full_url: "financesetu.com/reports/q4-2024",
+            avatar_text: "FS",
+            avatar_color: "bg-blue-500",
+          },
+          {
+            user_id: userId,
+            report_name: "Investment Portfolio Overview",
+            report_type: "Investment Report",
+            description: "Current holdings and performance metrics",
+            full_url: "financesetu.com/portfolio",
+            avatar_text: "FS",
+            avatar_color: "bg-green-500",
+          },
+        ]
+
+        const { data: inserted } = await supabase.from("financial_summaries").insert(sampleSummaries).select()
+        if (inserted) setFinancialSummaries(inserted)
+      }
+    } catch (error) {
+      console.error("[v0] Error fetching financial summaries:", error)
+    } finally {
+      setIsLoadingSummaries(false)
+    }
+  }
+
+  const fetchAnalysisData = async (supabase: any, userId: string) => {
+    try {
+      const { data, error } = await supabase.from("user_analysis_data").select("*").eq("user_id", userId).maybeSingle()
+
+      if (error) throw error
+
+      if (data) {
+        setAnalysisData(data)
+      }
+    } catch (error) {
+      console.error("[v0] Error fetching analysis data:", error)
+    } finally {
+      setIsLoadingAnalysis(false)
+    }
+  }
+
+  const handleDeleteNews = async (newsId: string) => {
+    try {
+      const supabase = createClient()
+      const { error } = await supabase.from("news_feed").delete().eq("id", newsId)
+
+      if (error) throw error
+
+      setNewsItems(newsItems.filter((item) => item.id !== newsId))
+      console.log("[v0] News item deleted successfully")
+    } catch (error) {
+      console.error("[v0] Error deleting news item:", error)
+    }
+  }
+
+  const handleDeleteChat = async (chatId: string) => {
+    try {
+      const supabase = createClient()
+      const { error } = await supabase.from("chat_conversations").delete().eq("id", chatId)
+
+      if (error) throw error
+
+      setChatHistory(chatHistory.filter((chat) => chat.id !== chatId))
+      console.log("[v0] Chat deleted successfully")
+    } catch (error) {
+      console.error("[v0] Error deleting chat:", error)
+    }
+  }
+
+  const handleDeleteSummary = async (summaryId: string) => {
+    try {
+      const supabase = createClient()
+      const { error } = await supabase.from("financial_summaries").delete().eq("id", summaryId)
+
+      if (error) throw error
+
+      setFinancialSummaries(financialSummaries.filter((summary) => summary.id !== summaryId))
+      console.log("[v0] Financial summary deleted successfully")
+    } catch (error) {
+      console.error("[v0] Error deleting summary:", error)
+    }
+  }
 
   const handleSaveSettings = async () => {
     try {
@@ -131,19 +439,37 @@ export default function UserSectionPage() {
         updated_at: new Date().toISOString(),
       }
 
-      const { error } = await supabase.from("user_onboarding_information").update(updateData).eq("email", userEmail)
+      const { error: onboardingError } = await supabase
+        .from("user_onboarding_information")
+        .update(updateData)
+        .eq("email", userEmail)
 
-      if (error) {
-        console.error("[v0] Error updating settings:", error)
+      if (onboardingError) {
+        console.error("[v0] Error updating settings:", onboardingError)
         alert("Error saving settings. Please try again.")
         return
+      }
+
+      const { error: analysisError } = await supabase
+        .from("user_analysis_data")
+        .update({
+          monthly_income: Number.parseFloat(settingsData.totalIncome) || 0,
+          monthly_expenses: Number.parseFloat(settingsData.totalExpenses) || 0,
+          monthly_savings: Number.parseFloat(settingsData.savings) || 0,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("user_id", userId)
+
+      if (analysisError) {
+        console.error("[v0] Error updating analysis data:", analysisError)
       }
 
       console.log("[v0] Settings updated successfully")
       alert("Settings saved successfully!")
 
-      // Refresh user data
+      // Refresh data
       setUserData({ ...userData, ...updateData })
+      await fetchAnalysisData(createClient(), userId)
     } catch (error) {
       console.error("[v0] Error in handleSaveSettings:", error)
       alert("Error saving settings. Please try again.")
@@ -161,24 +487,20 @@ export default function UserSectionPage() {
   }
 
   const [settingsData, setSettingsData] = useState({
-    name: "Abby Cooper",
-    age: "28",
-    occupation: "Working Professional (salaried employee)",
-    totalIncome: "75000",
-    totalExpenses: "45000",
-    savings: "30000",
-    majorAsset: "House",
-    assetValue: "5000000",
-    selfInvestment: "Yeha I do",
-    sendMoneyToFamily: "Yes",
-    hasInvestedBefore: "Yes",
-    investmentTypes: ["Stocks", "Mutual Funds", "FD"],
-    longTermGoal: "Buy a house",
-    longTermAmount: "2000000",
-    shortTermGoal: "Save for vacation",
-    shortTermAmount: "50000",
-    lifePlanningApproach: "I believe in systematic planning and regular investments",
-    likedOnboarding: "Yes",
+    name: "",
+    age: "",
+    occupation: "",
+    totalIncome: "",
+    totalExpenses: "",
+    savings: "",
+    majorAsset: "",
+    assetValue: "",
+    investmentTypes: [] as string[],
+    longTermGoal: "",
+    longTermAmount: "",
+    shortTermGoal: "",
+    shortTermAmount: "",
+    lifePlanningApproach: "",
   })
 
   const occupations = ["Student", "Working Professional (salaried employee)", "Self Employed / Entrepreneur", "Retired"]
@@ -191,88 +513,6 @@ export default function UserSectionPage() {
     "Mutual Funds",
     "Real Estate",
     "Business Investment",
-  ]
-
-  const newsItems = [
-    {
-      id: 1,
-      title: "RBI announces new monetary policy decisions for Q4 2024",
-      source: "Google News",
-      time: "2h ago",
-      url: "#",
-    },
-    {
-      id: 2,
-      title: "New tax regulations for startups in India announced",
-      source: "Instagram",
-      time: "5h ago",
-      url: "#",
-    },
-    {
-      id: 3,
-      title: "Stock market hits all-time high amid economic recovery",
-      source: "Google News",
-      time: "8h ago",
-      url: "#",
-    },
-  ]
-
-  const chatHistory = [
-    {
-      id: 1,
-      title: "How to calculate EMI?",
-      url: "chat.setu/hKWhPa",
-      originalUrl: "financesetu.com/chats",
-      time: "7m",
-      description: "EMI calculation query",
-      messageCount: 27,
-      avatar: "FS",
-      avatarColor: "#3b82f6",
-    },
-    {
-      id: 2,
-      title: "Investment tax advice",
-      url: "chat.setu/1SnIPc",
-      originalUrl: "financesetu.com/investments",
-      time: "10d",
-      description: "Tax planning discussion",
-      messageCount: 48,
-      avatar: "FS",
-      avatarColor: "#3b82f6",
-    },
-    {
-      id: 3,
-      title: "Startup registration help",
-      url: "chat.setu/1SnIPc",
-      originalUrl: "financesetu.com/startup",
-      time: "10d",
-      description: "Business setup guidance",
-      messageCount: 48,
-      avatar: "FS",
-      avatarColor: "#f97316",
-    },
-    {
-      id: 4,
-      title: "Home loan options",
-      url: "chat.setu/1SnIPc",
-      originalUrl: "financesetu.com/loans",
-      time: "10d",
-      description: "Loan comparison queries",
-      messageCount: 48,
-      avatar: "FS",
-      avatarColor: "#eab308",
-    },
-    {
-      id: 5,
-      title: "Savings account query",
-      url: "chat.setu/1SnIPc",
-      originalUrl: "financesetu.com/savings",
-      time: "10d",
-      description: "Bank account questions",
-      messageCount: 48,
-      avatar: "QS",
-      avatarColor: "#ef4444",
-    },
   ]
 
   const menuItems = [
@@ -291,12 +531,10 @@ export default function UserSectionPage() {
   const handleSendMessage = () => {
     if (!inputValue.trim()) return
 
-    // Add user message
     setMessages([...messages, { type: "user", text: inputValue }])
     setInputValue("")
     setIsProcessing(true)
 
-    // Simulate bot response
     setTimeout(() => {
       setMessages((prev) => [...prev, { type: "bot", text: "I received your message and I'm processing it." }])
       setIsProcessing(false)
@@ -310,11 +548,9 @@ export default function UserSectionPage() {
         className={`${isSidebarCollapsed ? "w-20" : "w-80"} h-screen bg-white border-r border-[#e5e5e5] flex flex-col sticky top-0 transition-all duration-300`}
       >
         {/* Header */}
-        {/* Added flex-shrink-0 to prevent header from shrinking */}
         <div className="p-6 border-b border-[#e5e5e5] flex items-center justify-between flex-shrink-0">
           {!isSidebarCollapsed && (
             <div className="flex items-center gap-3">
-              {/* Logo */}
               <div className="w-10 h-10 bg-[#202020] rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-lg">FS</span>
               </div>
@@ -326,7 +562,7 @@ export default function UserSectionPage() {
                   Finance Setu
                 </h2>
                 <p className="text-[#6b7280] text-xs" style={{ fontFamily: "var(--font-figtree), Figtree" }}>
-                  mail.financesetu@gmail.com
+                  {userEmail || "mail.financesetu@gmail.com"}
                 </p>
               </div>
             </div>
@@ -375,10 +611,10 @@ export default function UserSectionPage() {
           {/* Social Icons */}
           <div className={`flex items-center gap-3 mb-4 ${isSidebarCollapsed ? "flex-col px-0" : "px-4"}`}>
             <a
-              href="https://github.com"
+              href="https://github.com/Teamgrey21/SETU_MAIN_CODEREPOSITORY"
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 hover:bg-[#f3f4f6] rounded-md transition-colors"
+              className="p-2 hover:bg-[#f3f4f6] rounded-lg transition-colors"
               title="GitHub"
             >
               <Github className="w-5 h-5 text-[#6b7280]" />
@@ -442,12 +678,10 @@ export default function UserSectionPage() {
                   </div>
                 ) : userData ? (
                   <div className="flex flex-col gap-6">
-                    {/* Avatar */}
                     <div className="w-20 h-20 bg-[#f3f4f6] rounded-full flex items-center justify-center mx-auto">
                       <User className="w-10 h-10 text-[#6b7280]" />
                     </div>
 
-                    {/* User Details */}
                     <div className="space-y-4">
                       <div className="grid grid-cols-2 gap-4">
                         <div>
@@ -542,50 +776,33 @@ export default function UserSectionPage() {
                 className="bg-white border border-[#e5e5e5] rounded-2xl p-6 hover:shadow-md transition-all group h-full"
               >
                 <div className="flex flex-col items-center justify-center h-full">
-                  {/* Logo Icon */}
                   <div className="mb-6 relative">
                     <div className="w-16 h-16 bg-white border-2 border-[#202020] rounded-2xl rotate-45 flex items-center justify-center group-hover:scale-110 transition-transform">
                       <div className="w-6 h-6 bg-[#202020] rounded -rotate-45"></div>
                     </div>
                   </div>
-
-                  {/* Heading */}
-                  <h2
-                    className="text-2xl font-semibold text-[#202020] mb-3"
+                  <h3
+                    className="text-xl font-semibold text-[#202020] mb-2"
                     style={{ fontFamily: "var(--font-figtree), Figtree" }}
                   >
-                    How can I help today?
-                  </h2>
-
-                  {/* Subtitle */}
-                  <p className="text-[#6b7280] mb-6" style={{ fontFamily: "var(--font-figtree), Figtree" }}>
-                    Click here to start chatting with Setu
+                    Ask Setu
+                  </h3>
+                  <p
+                    className="text-sm text-[#6b7280] text-center"
+                    style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                  >
+                    Get personalized financial advice
                   </p>
-
-                  {/* Input Field Preview */}
-                  <div className="w-full max-w-sm">
-                    <div className="flex items-center gap-3 bg-[#f9fafb] border border-[#e5e5e5] rounded-2xl px-4 py-3 pointer-events-none">
-                      <MessageSquare className="w-5 h-5 text-[#9ca3af]" />
-                      <span
-                        className="flex-1 text-[#9ca3af] text-left"
-                        style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                      >
-                        Ask anything...
-                      </span>
-                      <Send className="w-5 h-5 text-[#9ca3af]" />
-                    </div>
-                  </div>
                 </div>
               </button>
             </div>
 
-            {/* News Feed Card */}
             <div className="bg-white border border-[#e5e5e5] rounded-2xl p-6">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-2">
-                  <Newspaper className="w-5 h-5 text-[#202020]" />
+                  <Newspaper className="w-5 h-5 text-[#6b7280]" />
                   <h2
-                    className="text-lg font-semibold text-[#202020]"
+                    className="text-lg font-semibold text-[#6b7280]"
                     style={{ fontFamily: "var(--font-figtree), Figtree" }}
                   >
                     Financial News Feed
@@ -593,176 +810,242 @@ export default function UserSectionPage() {
                 </div>
               </div>
 
-              {/* News Items */}
-              <div className="space-y-3 mb-6">
-                {newsItems.map((item) => (
-                  <a
-                    key={item.id}
-                    href={item.url}
-                    className="block p-4 bg-[#f9fafb] hover:bg-[#f3f4f6] rounded-xl transition-colors"
-                  >
-                    <div className="flex items-start justify-between gap-4">
+              {isLoadingNews ? (
+                <div className="flex items-center justify-center h-40">
+                  <p className="text-[#6b7280]">Loading news...</p>
+                </div>
+              ) : newsItems.length > 0 ? (
+                <div className="space-y-4">
+                  {newsItems.map((item) => (
+                    <div
+                      key={item.id}
+                      className="flex items-start justify-between p-4 bg-[#f9fafb] rounded-lg hover:bg-[#f3f4f6] transition-colors group"
+                    >
                       <div className="flex-1">
-                        <h3
-                          className="text-[#202020] font-medium mb-2 line-clamp-2"
+                        <a
+                          href={item.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[#202020] font-medium hover:underline"
                           style={{ fontFamily: "var(--font-figtree), Figtree" }}
                         >
                           {item.title}
-                        </h3>
-                        <div className="flex items-center gap-2 text-sm text-[#6b7280]">
-                          <span>{item.source}</span>
-                          <span>•</span>
-                          <span>{item.time}</span>
+                        </a>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span
+                            className="text-sm text-[#6b7280]"
+                            style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                          >
+                            {item.source}
+                          </span>
+                          <span className="text-sm text-[#9ca3af]">•</span>
+                          <span
+                            className="text-sm text-[#9ca3af]"
+                            style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                          >
+                            {item.time_ago}
+                          </span>
                         </div>
                       </div>
-                      <Link2 className="w-4 h-4 text-[#6b7280] flex-shrink-0" />
+                      <button
+                        onClick={() => handleDeleteNews(item.id)}
+                        className="p-2 text-[#6b7280] hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                        title="Delete news item"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
-                  </a>
-                ))}
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex items-center gap-3">
-                <button
-                  className="flex-1 px-6 py-3 bg-[#202020] hover:bg-[#404040] text-white rounded-xl transition-colors font-medium"
-                  style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                >
-                  Summaries
-                </button>
-                <button
-                  className="flex-1 px-6 py-3 bg-white border-2 border-[#202020] hover:bg-[#f9fafb] text-[#202020] rounded-xl transition-colors font-medium"
-                  style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                >
-                  The Whole Thing
-                </button>
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center h-40 gap-4">
+                  <Newspaper className="w-12 h-12 text-[#d1d5db]" />
+                  <p className="text-[#6b7280]">No news items yet</p>
+                </div>
+              )}
             </div>
           </div>
         )}
 
-        {activeSection === "Chat History" && (
-          <div className="flex-1 flex flex-col bg-[#f9fafb] p-8">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center gap-2">
-                <h1
-                  className="text-2xl font-semibold text-[#202020]"
-                  style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                >
-                  Chat History
-                </h1>
-                <ChevronLeft className="w-5 h-5 text-[#6b7280] rotate-90" />
+        {activeSection === "Analysis" && (
+          <div className="flex-1 flex flex-col bg-[#f9fafb] p-8 gap-6 overflow-y-auto">
+            <h1
+              className="text-2xl font-semibold text-[#202020]"
+              style={{ fontFamily: "var(--font-figtree), Figtree" }}
+            >
+              Financial Analysis
+            </h1>
+
+            {isLoadingAnalysis ? (
+              <div className="flex items-center justify-center h-40">
+                <p className="text-[#6b7280]">Loading analysis...</p>
               </div>
-              <button
-                className="flex items-center gap-2 px-4 py-2.5 bg-[#f3f4f6] hover:bg-[#e5e7eb] rounded-lg transition-colors"
-                style={{ fontFamily: "var(--font-figtree), Figtree" }}
-              >
-                <Plus className="w-4 h-4" />
-                <span className="font-medium text-[#202020]">New Chat</span>
-              </button>
-            </div>
-
-            {/* Chat History List */}
-            <div className="space-y-3 mb-8">
-              {chatHistory.map((chat) => (
-                <div
-                  key={chat.id}
-                  className="bg-white border border-[#e5e5e5] rounded-2xl p-5 flex items-center gap-4 hover:shadow-sm transition-shadow"
-                >
-                  {/* Avatar */}
-                  <div
-                    className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
-                    style={{ backgroundColor: chat.avatarColor }}
-                  >
-                    <span className="text-white font-semibold text-sm">{chat.avatar}</span>
-                  </div>
-
-                  {/* Link Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span
-                        className="font-semibold text-[#202020]"
+            ) : analysisData ? (
+              <>
+                <div className="grid grid-cols-4 gap-6">
+                  <div className="bg-white border border-[#e5e5e5] rounded-2xl p-6">
+                    <div className="flex items-center gap-2 mb-2">
+                      <TrendingUp className="w-5 h-5 text-blue-500" />
+                      <h3
+                        className="text-sm font-medium text-[#6b7280]"
                         style={{ fontFamily: "var(--font-figtree), Figtree" }}
                       >
-                        {chat.url}
-                      </span>
-                      <button className="p-1 hover:bg-[#f3f4f6] rounded transition-colors">
-                        <Copy className="w-4 h-4 text-[#6b7280]" />
-                      </button>
+                        Credit Risk
+                      </h3>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-[#6b7280]">
-                      <span className="flex items-center gap-1">
-                        <ChevronLeft className="w-3 h-3 rotate-180" />
-                        {chat.originalUrl}
-                      </span>
-                      <span>•</span>
-                      <span>{chat.time}</span>
-                    </div>
-                  </div>
-
-                  {/* Description */}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[#6b7280]" style={{ fontFamily: "var(--font-figtree), Figtree" }}>
-                      {chat.description}
+                    <p
+                      className="text-3xl font-bold text-[#202020]"
+                      style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                    >
+                      {analysisData.risk_credit}%
                     </p>
                   </div>
 
-                  {/* Convert Button */}
-                  <div className="flex items-center gap-3 flex-shrink-0">
-                    <button
-                      className="px-4 py-2 bg-[#202020] hover:bg-[#404040] text-white rounded-lg transition-colors font-medium text-sm"
+                  <div className="bg-white border border-[#e5e5e5] rounded-2xl p-6">
+                    <div className="flex items-center gap-2 mb-2">
+                      <TrendingDown className="w-5 h-5 text-red-500" />
+                      <h3
+                        className="text-sm font-medium text-[#6b7280]"
+                        style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                      >
+                        Market Risk
+                      </h3>
+                    </div>
+                    <p
+                      className="text-3xl font-bold text-[#202020]"
                       style={{ fontFamily: "var(--font-figtree), Figtree" }}
                     >
-                      Convert
-                    </button>
-                    <button className="p-2 hover:bg-[#f3f4f6] rounded-lg transition-colors">
-                      <Trash2 className="w-4 h-4 text-[#6b7280]" />
-                    </button>
+                      {analysisData.risk_market}%
+                    </p>
+                  </div>
+
+                  <div className="bg-white border border-[#e5e5e5] rounded-2xl p-6">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Wallet className="w-5 h-5 text-green-500" />
+                      <h3
+                        className="text-sm font-medium text-[#6b7280]"
+                        style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                      >
+                        Liquidity Risk
+                      </h3>
+                    </div>
+                    <p
+                      className="text-3xl font-bold text-[#202020]"
+                      style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                    >
+                      {analysisData.risk_liquidity}%
+                    </p>
+                  </div>
+
+                  <div className="bg-white border border-[#e5e5e5] rounded-2xl p-6">
+                    <div className="flex items-center gap-2 mb-2">
+                      <BarChart3 className="w-5 h-5 text-orange-500" />
+                      <h3
+                        className="text-sm font-medium text-[#6b7280]"
+                        style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                      >
+                        Operational Risk
+                      </h3>
+                    </div>
+                    <p
+                      className="text-3xl font-bold text-[#202020]"
+                      style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                    >
+                      {analysisData.risk_operational}%
+                    </p>
                   </div>
                 </div>
-              ))}
-            </div>
 
-            {/* Empty Bottom Sections */}
-            <div className="grid grid-cols-2 gap-6">
-              {/* Home Navigation Card */}
-              <button
-                onClick={() => setActiveSection("Home")}
-                className="bg-white border border-[#e5e5e5] rounded-2xl p-8 hover:shadow-lg transition-all group h-64 flex flex-col items-center justify-center"
-              >
-                <div className="w-16 h-16 bg-[#f3f4f6] rounded-2xl flex items-center justify-center mb-4 group-hover:bg-[#202020] transition-colors">
-                  <Home className="w-8 h-8 text-[#202020] group-hover:text-white transition-colors" />
-                </div>
-                <h3
-                  className="text-xl font-semibold text-[#202020] mb-2"
-                  style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                >
-                  Go to Home
-                </h3>
-                <p className="text-[#6b7280] text-center" style={{ fontFamily: "var(--font-figtree), Figtree" }}>
-                  View your dashboard and profile
-                </p>
-              </button>
+                <div className="bg-white border border-[#e5e5e5] rounded-2xl p-6">
+                  <h2
+                    className="text-lg font-semibold text-[#6b7280] mb-6"
+                    style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                  >
+                    Monthly Financial Breakdown
+                  </h2>
 
-              {/* Financial Summaries Navigation Card */}
-              <button
-                onClick={() => setActiveSection("Financial Summaries")}
-                className="bg-white border border-[#e5e5e5] rounded-2xl p-8 hover:shadow-lg transition-all group h-64 flex flex-col items-center justify-center"
-              >
-                <div className="w-16 h-16 bg-[#f3f4f6] rounded-2xl flex items-center justify-center mb-4 group-hover:bg-[#202020] transition-colors">
-                  <FileText className="w-8 h-8 text-[#202020] group-hover:text-white transition-colors" />
+                  <div className="grid grid-cols-3 gap-6">
+                    <div className="p-6 bg-green-50 rounded-lg">
+                      <p className="text-sm text-green-700 mb-2" style={{ fontFamily: "var(--font-figtree), Figtree" }}>
+                        Income
+                      </p>
+                      <p
+                        className="text-2xl font-bold text-green-900"
+                        style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                      >
+                        ₹{analysisData.monthly_income.toLocaleString()}
+                      </p>
+                    </div>
+
+                    <div className="p-6 bg-red-50 rounded-lg">
+                      <p className="text-sm text-red-700 mb-2" style={{ fontFamily: "var(--font-figtree), Figtree" }}>
+                        Expenses
+                      </p>
+                      <p
+                        className="text-2xl font-bold text-red-900"
+                        style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                      >
+                        ₹{analysisData.monthly_expenses.toLocaleString()}
+                      </p>
+                    </div>
+
+                    <div className="p-6 bg-blue-50 rounded-lg">
+                      <p className="text-sm text-blue-700 mb-2" style={{ fontFamily: "var(--font-figtree), Figtree" }}>
+                        Savings
+                      </p>
+                      <p
+                        className="text-2xl font-bold text-blue-900"
+                        style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                      >
+                        ₹{analysisData.monthly_savings.toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <h3
-                  className="text-xl font-semibold text-[#202020] mb-2"
-                  style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                >
-                  Financial Summaries
-                </h3>
-                <p className="text-[#6b7280] text-center" style={{ fontFamily: "var(--font-figtree), Figtree" }}>
-                  Access your financial reports
-                </p>
-              </button>
-            </div>
+
+                {/* Navigation Cards */}
+                <div className="grid grid-cols-2 gap-6">
+                  <button
+                    onClick={() => setActiveSection("Home")}
+                    className="bg-white border border-[#e5e5e5] rounded-2xl p-8 hover:shadow-md transition-all group"
+                  >
+                    <div className="flex flex-col items-center gap-4">
+                      <div className="w-16 h-16 bg-[#f3f4f6] group-hover:bg-[#e5e7eb] rounded-full flex items-center justify-center transition-colors">
+                        <Home className="w-8 h-8 text-[#6b7280]" />
+                      </div>
+                      <h3
+                        className="text-lg font-semibold text-[#202020]"
+                        style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                      >
+                        Go to Home
+                      </h3>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => setActiveSection("Financial Summaries")}
+                    className="bg-white border border-[#e5e5e5] rounded-2xl p-8 hover:shadow-md transition-all group"
+                  >
+                    <div className="flex flex-col items-center gap-4">
+                      <div className="w-16 h-16 bg-[#f3f4f6] group-hover:bg-[#e5e7eb] rounded-full flex items-center justify-center transition-colors">
+                        <FileText className="w-8 h-8 text-[#6b7280]" />
+                      </div>
+                      <h3
+                        className="text-lg font-semibold text-[#202020]"
+                        style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                      >
+                        View Financial Summaries
+                      </h3>
+                    </div>
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className="flex flex-col items-center justify-center h-40 gap-4">
+                <BarChart3 className="w-12 h-12 text-[#d1d5db]" />
+                <p className="text-[#6b7280]">No analysis data available</p>
+              </div>
+            )}
           </div>
         )}
 
@@ -882,534 +1165,241 @@ export default function UserSectionPage() {
           </>
         )}
 
-        {/* Analysis Section */}
-        {activeSection === "Analysis" && (
-          <div className="flex-1 flex flex-col bg-[#f9fafb] p-8 gap-6 overflow-y-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Chat History with Setu Table */}
-              <div className="bg-white border border-[#e5e5e5] rounded-2xl p-6">
-                <div className="flex items-center justify-between mb-6">
-                  <h2
-                    className="text-xl font-semibold text-[#202020]"
-                    style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                  >
-                    Chat History with Setu
-                  </h2>
-                  <button
-                    className="text-sm text-[#3b82f6] hover:text-[#2563eb] font-medium transition-colors"
-                    style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                  >
-                    See All
-                  </button>
-                </div>
-
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-[#e5e5e5]">
-                        <th
-                          className="text-left py-3 px-2 text-sm font-medium text-[#6b7280]"
-                          style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                        >
-                          #
-                        </th>
-                        <th
-                          className="text-left py-3 px-2 text-sm font-medium text-[#6b7280]"
-                          style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                        >
-                          Dates
-                        </th>
-                        <th
-                          className="text-left py-3 px-2 text-sm font-medium text-[#6b7280]"
-                          style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                        >
-                          Employee
-                        </th>
-                        <th
-                          className="text-left py-3 px-2 text-sm font-medium text-[#6b7280]"
-                          style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                        >
-                          Employeer
-                        </th>
-                        <th
-                          className="text-left py-3 px-2 text-sm font-medium text-[#6b7280]"
-                          style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                        >
-                          Amount
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {[
-                        {
-                          id: 1,
-                          date: "Aug 28, 2013",
-                          employee: "Theresa Steward",
-                          employeer: "Pat Robertson",
-                          amount: "5000",
-                        },
-                        {
-                          id: 2,
-                          date: "July 7, 2014",
-                          employee: "Adrian Shavkat",
-                          employeer: "Norman Cooper",
-                          amount: "5850",
-                        },
-                        {
-                          id: 3,
-                          date: "May 2, 2015",
-                          employee: "Ralph Black",
-                          employeer: "Audrey Jones",
-                          amount: "5450",
-                        },
-                        {
-                          id: 4,
-                          date: "Feb 6, 2016",
-                          employee: "Eduardo Webb",
-                          employeer: "Audrey Jones",
-                          amount: "5700",
-                        },
-                      ].map((row) => (
-                        <tr key={row.id} className="border-b border-[#f3f4f6] hover:bg-[#f9fafb] transition-colors">
-                          <td
-                            className="py-3 px-2 text-sm text-[#6b7280]"
-                            style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                          >
-                            {row.id}
-                          </td>
-                          <td
-                            className="py-3 px-2 text-sm text-[#202020]"
-                            style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                          >
-                            {row.date}
-                          </td>
-                          <td
-                            className="py-3 px-2 text-sm text-[#202020]"
-                            style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                          >
-                            {row.employee}
-                          </td>
-                          <td
-                            className="py-3 px-2 text-sm text-[#202020]"
-                            style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                          >
-                            {row.employeer}
-                          </td>
-                          <td
-                            className="py-3 px-2 text-sm text-[#202020]"
-                            style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                          >
-                            {row.amount}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              {/* Financial Documents Table */}
-              <div className="bg-white border border-[#e5e5e5] rounded-2xl p-6">
-                <div className="flex items-center justify-between mb-6">
-                  <h2
-                    className="text-xl font-semibold text-[#202020]"
-                    style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                  >
-                    Financial Documents
-                  </h2>
-                  <button
-                    className="flex items-center gap-2 text-sm text-[#3b82f6] hover:text-[#2563eb] font-medium transition-colors"
-                    style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                  >
-                    <Upload className="w-4 h-4" />
-                    Upload
-                  </button>
-                </div>
-
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-[#e5e5e5]">
-                        <th
-                          className="text-left py-3 px-2 text-sm font-medium text-[#6b7280]"
-                          style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                        >
-                          #
-                        </th>
-                        <th
-                          className="text-left py-3 px-2 text-sm font-medium text-[#6b7280]"
-                          style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                        >
-                          Title
-                        </th>
-                        <th
-                          className="text-left py-3 px-2 text-sm font-medium text-[#6b7280]"
-                          style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                        >
-                          Date
-                        </th>
-                        <th
-                          className="text-left py-3 px-2 text-sm font-medium text-[#6b7280]"
-                          style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                        >
-                          Type
-                        </th>
-                        <th
-                          className="text-left py-3 px-2 text-sm font-medium text-[#6b7280]"
-                          style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                        >
-                          Download
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {[
-                        { id: 1, title: "Passport Scan", date: "2023-01-01" },
-                        { id: 2, title: "Income Statement", date: "2023-02-01" },
-                        { id: 3, title: "Bank Statement", date: "2023-03-01" },
-                      ].map((row) => (
-                        <tr key={row.id} className="border-b border-[#f3f4f6] hover:bg-[#f9fafb] transition-colors">
-                          <td
-                            className="py-3 px-2 text-sm text-[#6b7280]"
-                            style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                          >
-                            {row.id}
-                          </td>
-                          <td
-                            className="py-3 px-2 text-sm text-[#202020]"
-                            style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                          >
-                            {row.title}
-                          </td>
-                          <td
-                            className="py-3 px-2 text-sm text-[#202020]"
-                            style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                          >
-                            {row.date}
-                          </td>
-                          <td
-                            className="py-3 px-2 text-sm text-[#202020]"
-                            style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                          >
-                            Document
-                          </td>
-                          <td
-                            className="py-3 px-2 text-sm text-[#202020]"
-                            style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                          >
-                            <button className="p-1 hover:bg-[#f3f4f6] rounded transition-colors">
-                              <Download className="w-4 h-4 text-[#6b7280]" />
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Risk Indicators Widget */}
-              <div className="bg-white border border-[#e5e5e5] rounded-2xl p-6">
-                <h2
-                  className="text-xl font-semibold text-[#202020] mb-6"
-                  style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                >
-                  Risk Indicators
-                </h2>
-
-                <div className="space-y-4">
-                  {[
-                    { label: "Credit Risk", value: 35, color: "bg-green-500" },
-                    { label: "Market Risk", value: 68, color: "bg-yellow-500" },
-                    { label: "Liquidity Risk", value: 82, color: "bg-red-500" },
-                    { label: "Operational Risk", value: 45, color: "bg-blue-500" },
-                  ].map((risk, index) => (
-                    <div key={index}>
-                      <div className="flex justify-between items-center mb-2">
-                        <span
-                          className="text-sm font-medium text-[#202020]"
-                          style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                        >
-                          {risk.label}
-                        </span>
-                        <span
-                          className="text-sm font-semibold text-[#202020]"
-                          style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                        >
-                          {risk.value}%
-                        </span>
-                      </div>
-                      <div className="w-full bg-[#f3f4f6] rounded-full h-2.5">
-                        <div
-                          className={`${risk.color} h-2.5 rounded-full transition-all duration-300`}
-                          style={{ width: `${risk.value}%` }}
-                        ></div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Calendar Widget */}
-              <div className="bg-white border border-[#e5e5e5] rounded-2xl p-6">
-                <h2
-                  className="text-xl font-semibold text-[#202020] mb-6"
-                  style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                >
-                  Calendar
-                </h2>
-
-                <div className="space-y-4">
-                  {/* Month & Year Header */}
-                  <div className="flex items-center justify-between mb-4">
-                    <button className="p-2 hover:bg-[#f3f4f6] rounded-lg transition-colors">
-                      <ChevronLeft className="w-5 h-5 text-[#6b7280]" />
-                    </button>
-                    <span
-                      className="text-lg font-semibold text-[#202020]"
-                      style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                    >
-                      November 2025
-                    </span>
-                    <button className="p-2 hover:bg-[#f3f4f6] rounded-lg transition-colors">
-                      <ChevronRight className="w-5 h-5 text-[#6b7280]" />
-                    </button>
-                  </div>
-
-                  {/* Days of Week */}
-                  <div className="grid grid-cols-7 gap-2 text-center">
-                    {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => (
-                      <div
-                        key={day}
-                        className="text-xs font-medium text-[#6b7280] py-2"
-                        style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                      >
-                        {day}
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Calendar Days */}
-                  <div className="grid grid-cols-7 gap-2 text-center">
-                    {Array.from({ length: 35 }, (_, i) => {
-                      const day = i - 2
-                      const isToday = day === 28
-                      const isInMonth = day > 0 && day <= 30
-                      return (
-                        <button
-                          key={i}
-                          className={`py-2 text-sm rounded-lg transition-colors ${
-                            isToday
-                              ? "bg-[#202020] text-white font-semibold"
-                              : isInMonth
-                                ? "hover:bg-[#f3f4f6] text-[#202020]"
-                                : "text-[#d1d5db]"
-                          }`}
-                          style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                        >
-                          {isInMonth ? day : ""}
-                        </button>
-                      )
-                    })}
-                  </div>
-                </div>
-              </div>
-
-              {/* Financial Overview Widget */}
-              <div className="bg-white border border-[#e5e5e5] rounded-2xl p-6">
-                <h2
-                  className="text-xl font-semibold text-[#202020] mb-6"
-                  style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                >
-                  Financial Overview
-                </h2>
-
-                <div className="space-y-6">
-                  {[
-                    {
-                      label: "Income",
-                      amount: "₹85,000",
-                      icon: TrendingUp,
-                      color: "text-green-500",
-                      bgColor: "bg-green-50",
-                    },
-                    {
-                      label: "Expenses",
-                      amount: "₹52,000",
-                      icon: TrendingDown,
-                      color: "text-red-500",
-                      bgColor: "bg-red-50",
-                    },
-                    {
-                      label: "Savings",
-                      amount: "₹33,000",
-                      icon: Wallet,
-                      color: "text-blue-500",
-                      bgColor: "bg-blue-50",
-                    },
-                  ].map((item, index) => {
-                    const Icon = item.icon
-                    return (
-                      <div
-                        key={index}
-                        className="flex items-center justify-between p-4 bg-[#f9fafb] rounded-xl hover:bg-[#f3f4f6] transition-colors"
-                      >
-                        <div className="flex items-center gap-4">
-                          <div className={`${item.bgColor} p-3 rounded-xl`}>
-                            <Icon className={`w-5 h-5 ${item.color}`} />
-                          </div>
-                          <span
-                            className="text-sm font-medium text-[#6b7280]"
-                            style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                          >
-                            {item.label}
-                          </span>
-                        </div>
-                        <span
-                          className="text-lg font-semibold text-[#202020]"
-                          style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                        >
-                          {item.amount}
-                        </span>
-                      </div>
-                    )
-                  })}
-
-                  <div className="pt-4 border-t border-[#e5e5e5]">
-                    <div className="flex justify-between items-center">
-                      <span
-                        className="text-sm font-medium text-[#6b7280]"
-                        style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                      >
-                        Net Balance
-                      </span>
-                      <span
-                        className="text-xl font-bold text-green-500"
-                        style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                      >
-                        ₹33,000
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Financial Summaries Section */}
         {activeSection === "Financial Summaries" && (
           <div className="flex-1 flex flex-col bg-[#f9fafb] p-8 gap-6 overflow-y-auto">
-            <div className="bg-white border border-[#e5e5e5] rounded-2xl p-6">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-2">
-                  <h2
-                    className="text-xl font-semibold text-[#202020]"
-                    style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                  >
-                    Financial Summaries
-                  </h2>
-                </div>
+            <div className="flex items-center justify-between">
+              <h1
+                className="text-2xl font-semibold text-[#202020]"
+                style={{ fontFamily: "var(--font-figtree), Figtree" }}
+              >
+                Your Financial Reports
+              </h1>
+            </div>
+
+            {isLoadingSummaries ? (
+              <div className="flex items-center justify-center h-40">
+                <p className="text-[#6b7280]">Loading summaries...</p>
               </div>
-
-              {/* Chat History Items */}
-              <div className="space-y-4">
-                {[
-                  {
-                    avatar: "FS",
-                    color: "bg-blue-500",
-                    reportName: "EMI Calculation Report",
-                    fullUrl: "financesetu.com/chats",
-                    time: "7m",
-                    description: "EMI calculation query",
-                  },
-                  {
-                    avatar: "FS",
-                    color: "bg-blue-500",
-                    reportName: "Tax Planning Report",
-                    fullUrl: "financesetu.com/investments",
-                    time: "10d",
-                    description: "Tax planning discussion",
-                  },
-                  {
-                    avatar: "FS",
-                    color: "bg-orange-500",
-                    reportName: "Business Setup Report",
-                    fullUrl: "financesetu.com/startup",
-                    time: "10d",
-                    description: "Business setup guidance",
-                  },
-                  {
-                    avatar: "FS",
-                    color: "bg-yellow-500",
-                    reportName: "Loan Comparison Report",
-                    fullUrl: "financesetu.com/loans",
-                    time: "10d",
-                    description: "Loan comparison queries",
-                  },
-                  {
-                    avatar: "QS",
-                    color: "bg-red-500",
-                    reportName: "Bank Account Report",
-                    fullUrl: "financesetu.com/savings",
-                    time: "10d",
-                    description: "Bank account questions",
-                  },
-                ].map((item, index) => (
+            ) : financialSummaries.length > 0 ? (
+              <div className="grid grid-cols-1 gap-4">
+                {financialSummaries.map((summary) => (
                   <div
-                    key={index}
-                    className="flex items-center gap-4 p-4 border border-[#e5e5e5] rounded-xl hover:shadow-sm transition-shadow"
+                    key={summary.id}
+                    className="bg-white border border-[#e5e5e5] rounded-2xl p-6 hover:shadow-md transition-all group"
                   >
-                    {/* Avatar */}
-                    <div
-                      className={`${item.color} w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0`}
-                    >
-                      <span className="text-white font-semibold text-sm">{item.avatar}</span>
-                    </div>
-
-                    {/* URL and Details */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span
-                          className="font-semibold text-[#202020]"
-                          style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4 flex-1">
+                        <div
+                          className={`w-12 h-12 ${summary.avatar_color} rounded-lg flex items-center justify-center`}
                         >
-                          {item.reportName}
-                        </span>
-                        <button className="text-[#6b7280] hover:text-[#202020] transition-colors"></button>
+                          <span className="text-white font-bold text-sm">{summary.avatar_text}</span>
+                        </div>
+                        <div className="flex-1">
+                          <h3
+                            className="text-base font-semibold text-[#202020] mb-1"
+                            style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                          >
+                            {summary.report_name}
+                          </h3>
+                          <p className="text-sm text-[#6b7280]" style={{ fontFamily: "var(--font-figtree), Figtree" }}>
+                            {summary.description || summary.report_type || "Financial report"}
+                          </p>
+                          {summary.full_url && (
+                            <a
+                              href={summary.full_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-sm text-blue-500 hover:underline"
+                              style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                            >
+                              {summary.full_url}
+                            </a>
+                          )}
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-[#6b7280]">
-                        <span>•</span>
-                        <span>{item.time}</span>
+                      <div className="flex items-center gap-2">
+                        <button className="p-3 hover:bg-[#f3f4f6] rounded-lg transition-colors">
+                          <Download className="w-5 h-5 text-[#6b7280]" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteSummary(summary.id)}
+                          className="p-3 text-[#6b7280] hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                          title="Delete summary"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </button>
                       </div>
-                    </div>
-
-                    {/* Description */}
-                    <div className="flex-1 min-w-0"></div>
-
-                    {/* Actions */}
-                    <div className="flex items-center gap-3 flex-shrink-0">
-                      <button
-                        className="flex items-center gap-2 px-6 py-2 bg-[#202020] text-white rounded-lg hover:bg-[#404040] transition-colors font-medium"
-                        style={{ fontFamily: "var(--font-figtree), Figtree" }}
-                      >
-                        <Download className="w-4 h-4" />
-                        Download
-                      </button>
-                      <button className="text-[#6b7280] hover:text-red-500 transition-colors">
-                        <Trash2 className="w-5 h-5" />
-                      </button>
                     </div>
                   </div>
                 ))}
               </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center h-40 gap-4">
+                <FileText className="w-12 h-12 text-[#d1d5db]" />
+                <p className="text-[#6b7280]">No financial summaries yet</p>
+              </div>
+            )}
+
+            {/* Document Upload Section */}
+            <div className="bg-white border border-[#e5e5e5] rounded-2xl p-6">
+              <h2
+                className="text-lg font-semibold text-[#6b7280] mb-4"
+                style={{ fontFamily: "var(--font-figtree), Figtree" }}
+              >
+                Upload Financial Documents
+              </h2>
+              <div className="border-2 border-dashed border-[#e5e5e5] rounded-lg p-8 text-center hover:border-[#202020] transition-colors cursor-pointer">
+                <Upload className="w-10 h-10 text-[#6b7280] mx-auto mb-4" />
+                <p className="text-sm text-[#6b7280]" style={{ fontFamily: "var(--font-figtree), Figtree" }}>
+                  Drag and drop files here or click to browse
+                </p>
+              </div>
             </div>
           </div>
         )}
 
-        {/* Settings Section */}
+        {activeSection === "Chat History" && (
+          <div className="flex-1 flex flex-col bg-[#f9fafb] p-8 gap-6 overflow-y-auto">
+            <div className="flex items-center justify-between">
+              <h1
+                className="text-2xl font-semibold text-[#202020]"
+                style={{ fontFamily: "var(--font-figtree), Figtree" }}
+              >
+                Chat History
+              </h1>
+              <button className="px-4 py-2 bg-[#202020] text-white rounded-lg hover:bg-[#404040] transition-colors flex items-center gap-2">
+                <Plus className="w-5 h-5" />
+                <span style={{ fontFamily: "var(--font-figtree), Figtree" }}>New Chat</span>
+              </button>
+            </div>
+
+            {isLoadingChats ? (
+              <div className="flex items-center justify-center h-40">
+                <p className="text-[#6b7280]">Loading chats...</p>
+              </div>
+            ) : chatHistory.length > 0 ? (
+              <div className="grid grid-cols-1 gap-4">
+                {chatHistory.map((chat) => (
+                  <div
+                    key={chat.id}
+                    className="bg-white border border-[#e5e5e5] rounded-2xl p-6 hover:shadow-md transition-all group"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4 flex-1">
+                        <div className={`w-12 h-12 ${chat.avatar_color} rounded-lg flex items-center justify-center`}>
+                          <span className="text-white font-bold text-sm">{chat.avatar_text}</span>
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3
+                              className="text-base font-semibold text-[#202020]"
+                              style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                            >
+                              {chat.title}
+                            </h3>
+                            <span
+                              className="text-sm text-[#6b7280]"
+                              style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                            >
+                              • {chat.message_count} messages
+                            </span>
+                          </div>
+                          {chat.description && (
+                            <p
+                              className="text-sm text-[#6b7280] mb-2"
+                              style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                            >
+                              {chat.description}
+                            </p>
+                          )}
+                          <div className="flex items-center gap-4">
+                            {chat.short_url && (
+                              <div className="flex items-center gap-2">
+                                <Link2 className="w-4 h-4 text-[#6b7280]" />
+                                <span
+                                  className="text-sm text-[#6b7280]"
+                                  style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                                >
+                                  {chat.short_url}
+                                </span>
+                              </div>
+                            )}
+                            {chat.original_url && (
+                              <a
+                                href={chat.original_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-sm text-blue-500 hover:underline"
+                                style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                              >
+                                View conversation
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button className="p-3 hover:bg-[#f3f4f6] rounded-lg transition-colors">
+                          <Copy className="w-5 h-5 text-[#6b7280]" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteChat(chat.id)}
+                          className="p-3 text-[#6b7280] hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                          title="Delete chat"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center h-40 gap-4">
+                <History className="w-12 h-12 text-[#d1d5db]" />
+                <p className="text-[#6b7280]">No chat history yet</p>
+              </div>
+            )}
+
+            {/* Navigation Cards */}
+            <div className="grid grid-cols-2 gap-6">
+              <button
+                onClick={() => setActiveSection("Home")}
+                className="bg-white border border-[#e5e5e5] rounded-2xl p-8 hover:shadow-md transition-all group"
+              >
+                <div className="flex flex-col items-center gap-4">
+                  <div className="w-16 h-16 bg-[#f3f4f6] group-hover:bg-[#e5e7eb] rounded-full flex items-center justify-center transition-colors">
+                    <Home className="w-8 h-8 text-[#6b7280]" />
+                  </div>
+                  <h3
+                    className="text-lg font-semibold text-[#202020]"
+                    style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                  >
+                    Go to Home
+                  </h3>
+                </div>
+              </button>
+
+              <button
+                onClick={() => setActiveSection("Financial Summaries")}
+                className="bg-white border border-[#e5e5e5] rounded-2xl p-8 hover:shadow-md transition-all group"
+              >
+                <div className="flex flex-col items-center gap-4">
+                  <div className="w-16 h-16 bg-[#f3f4f6] group-hover:bg-[#e5e7eb] rounded-full flex items-center justify-center transition-colors">
+                    <FileText className="w-8 h-8 text-[#6b7280]" />
+                  </div>
+                  <h3
+                    className="text-lg font-semibold text-[#202020]"
+                    style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                  >
+                    View Financial Summaries
+                  </h3>
+                </div>
+              </button>
+            </div>
+          </div>
+        )}
+
         {activeSection === "Settings" && (
           <div className="flex-1 flex flex-col bg-[#f9fafb] p-8 gap-6 overflow-y-auto">
             <div className="max-w-4xl mx-auto w-full space-y-6">

@@ -75,7 +75,7 @@ const Footer = ({
   socialLinks = {
     twitter: "https://twitter.com",
     linkedin: "https://linkedin.com",
-    github: "https://github.com",
+    github: "https://github.com/Teamgrey21/SETU_MAIN_CODEREPOSITORY",
     email: "hello@financesetu.com",
   },
   copyrightText,
@@ -142,6 +142,9 @@ const Footer = ({
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-[#666666]" style={{ fontFamily: "Figtree" }}>
               {copyright}
+            </p>
+            <p className="text-sm text-[#666666] italic" style={{ fontFamily: "Figtree" }}>
+              *A Prototype of the product for mumbai hacks
             </p>
           </div>
         </motion.div>
