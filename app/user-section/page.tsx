@@ -417,6 +417,38 @@ export default function UserSectionPage() {
     }
   }
 
+  const handleConvertToSummary = async (chat: ChatConversation) => {
+    try {
+      const supabase = createClient()
+
+      // Create a new financial summary from the chat
+      const newSummary = {
+        user_id: userId,
+        report_name: `Financial Summary: ${chat.title}`,
+        report_type: "Chat Conversion",
+        description: `Converted from chat: ${chat.description || chat.title}`,
+        full_url: chat.original_url,
+        avatar_text: chat.avatar_text,
+        avatar_color: chat.avatar_color,
+      }
+
+      const { data, error } = await supabase.from("financial_summaries").insert([newSummary]).select().single()
+
+      if (error) throw error
+
+      console.log("[v0] Chat converted to financial summary successfully")
+
+      // Add the new summary to the state
+      if (data) {
+        setFinancialSummaries([data, ...financialSummaries])
+        alert("Chat converted to financial summary successfully!")
+      }
+    } catch (error) {
+      console.error("[v0] Error converting chat to summary:", error)
+      alert("Error converting chat. Please try again.")
+    }
+  }
+
   const handleSaveSettings = async () => {
     try {
       const supabase = createClient()
@@ -528,17 +560,51 @@ export default function UserSectionPage() {
     { name: "Help Center", icon: HelpCircle },
   ]
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!inputValue.trim()) return
 
-    setMessages([...messages, { type: "user", text: inputValue }])
+    const userMessage = inputValue.trim()
+    setMessages([...messages, { type: "user", text: userMessage }])
     setInputValue("")
     setIsProcessing(true)
 
-    setTimeout(() => {
-      setMessages((prev) => [...prev, { type: "bot", text: "I received your message and I'm processing it." }])
+    try {
+      console.log("[v0] Sending message to n8n webhook:", userMessage)
+
+      const response = await fetch("https://finance-setu.app.n8n.cloud/webhook/chat-ai-agent", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: userMessage,
+          userId: userId,
+          userEmail: userEmail,
+          timestamp: new Date().toISOString(),
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`API request failed with status ${response.status}`)
+      }
+
+      const data = await response.json()
+      console.log("[v0] Received response from n8n:", data)
+
+      const botMessage = data.response || data.message || data.output || "I received your message."
+      setMessages((prev) => [...prev, { type: "bot", text: botMessage }])
+    } catch (error) {
+      console.error("[v0] Error calling n8n webhook:", error)
+      setMessages((prev) => [
+        ...prev,
+        {
+          type: "bot",
+          text: "Sorry, I encountered an error processing your request. Please try again.",
+        },
+      ])
+    } finally {
       setIsProcessing(false)
-    }, 1000)
+    }
   }
 
   return (
@@ -1339,6 +1405,16 @@ export default function UserSectionPage() {
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleConvertToSummary(chat)}
+                          className="px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors flex items-center gap-2 opacity-0 group-hover:opacity-100"
+                          title="Convert to financial summary"
+                        >
+                          <FileText className="w-4 h-4" />
+                          <span className="text-sm font-medium" style={{ fontFamily: "var(--font-figtree), Figtree" }}>
+                            Convert
+                          </span>
+                        </button>
                         <button className="p-3 hover:bg-[#f3f4f6] rounded-lg transition-colors">
                           <Copy className="w-5 h-5 text-[#6b7280]" />
                         </button>
