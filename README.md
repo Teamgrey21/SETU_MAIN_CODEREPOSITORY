@@ -61,7 +61,3 @@ Managing finances in India can be overwhelming. Finance SETU breaks down the com
 
 Feedback, suggestions, and contributions are welcome!
 Open an issue or submit a PR to help enhance Finance SETU.
-
----
-
-Let me know if you want this README in a different style (more minimal, more technical, more marketing-focused, etc.) or want badges, installation steps, screenshots, or a logo added!
