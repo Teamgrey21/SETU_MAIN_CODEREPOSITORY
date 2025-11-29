@@ -490,7 +490,7 @@ const CaseStudiesCarousel = () => {
                   >
                     "{currentStudy.quote}"
                   </p>
-                  <footer className="text-sm text-muted-foreground">{currentStudy.attribution}</footer>
+                  
                 </blockquote>
               </motion.div>
             </AnimatePresence>
