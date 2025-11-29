@@ -1,6 +1,6 @@
 "use client"
 import { motion } from "framer-motion"
-import { ArrowUpRight } from "lucide-react"
+
 type ProductTeaserCardProps = {
   dailyVolume?: string
   dailyVolumeLabel?: string
@@ -33,9 +33,9 @@ const ProductTeaserCard = (props: ProductTeaserCardProps) => {
 
   // @return
   return (
-    <section className="w-full px-8 pt-32 pb-16">
+    <section className="w-full px-4 sm:px-8 pt-12 sm:pt-24 lg:pt-32 pb-6 sm:pb-12 lg:pb-16">
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-12 gap-2">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-5 lg:gap-8">
           <motion.div
             initial={{
               opacity: 0,
@@ -47,62 +47,26 @@ const ProductTeaserCard = (props: ProductTeaserCardProps) => {
               duration: 0.8,
               ease: [0.645, 0.045, 0.355, 1],
             }}
-            className="col-span-12 lg:col-span-6 bg-[#e9e9e9] rounded-[40px] p-12 lg:p-16 flex flex-col justify-end aspect-square overflow-hidden"
+            className="col-span-1 bg-[#e9e9e9] rounded-2xl sm:rounded-3xl lg:rounded-[40px] p-4 sm:p-6 lg:p-12 flex flex-col justify-end aspect-square overflow-hidden"
           >
-            <a
-              href={primaryButtonHref}
-              onClick={(e) => e.preventDefault()}
-              className="flex flex-col gap-1 text-[#9a9a9a]"
-            >
-              
-              <span
-                className="text-[32px] leading-[160px] tracking-tight bg-gradient-to-r from-[#202020] via-[#00517f] via-[#52aee3] to-[#9ed2fc] bg-clip-text text-transparent"
-                style={{
-                  fontFeatureSettings: '"clig" 0, "liga" 0',
-                  height: "98px",
-                  marginBottom: "0px",
-                  paddingTop: "",
-                  display: "none",
-                }}
-              >
-                {dailyVolume}
-              </span>
-            </a>
-
             <h1
-              className="text-[56px] leading-[60px] tracking-tight text-[#202020] max-w-[520px] mb-6"
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl leading-snug sm:leading-tight tracking-tight text-[#202020] max-w-full lg:max-w-[520px] mb-3 sm:mb-4 lg:mb-6"
               style={{
                 fontWeight: "500",
-                fontFamily: "var(--font-figtree), Figtree",
+                fontFamily: "var(--font-space-grotesk), 'Space Grotesk'",
               }}
             >
               {headline}
             </h1>
 
             <p
-              className="text-lg leading-7 text-[#404040] max-w-[520px] mb-6"
+              className="text-sm sm:text-base lg:text-lg leading-6 sm:leading-7 text-[#404040] max-w-full lg:max-w-[520px]"
               style={{
                 fontFamily: "var(--font-figtree), Figtree",
               }}
             >
               {subheadline}
             </p>
-
-            <div className="max-w-[520px] mb-0">
-              <p
-                className="text-base leading-5"
-                style={{
-                  display: "none",
-                }}
-              >
-                {description}
-              </p>
-            </div>
-
-            <ul className="flex gap-1.5 flex-wrap mt-10">
-              <li></li>
-              <li></li>
-            </ul>
           </motion.div>
 
           <motion.div
@@ -117,7 +81,7 @@ const ProductTeaserCard = (props: ProductTeaserCardProps) => {
               ease: [0.645, 0.045, 0.355, 1],
               delay: 0.2,
             }}
-            className="col-span-12 lg:col-span-6 bg-white rounded-[40px] flex justify-center items-center aspect-square overflow-hidden"
+            className="col-span-1 bg-white rounded-2xl sm:rounded-3xl lg:rounded-[40px] flex justify-center items-center aspect-video sm:aspect-square lg:aspect-square overflow-hidden"
             style={{
               backgroundImage: "url(/images/gemini-generated-image-upu3ngupu3ngupu3.png)",
               backgroundSize: "cover",

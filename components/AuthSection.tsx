@@ -110,7 +110,7 @@ export const AuthSection = () => {
             .from("user_onboarding_information")
             .select("id")
             .eq("user_id", data.user.id)
-            .single()
+            .maybeSingle()
 
           if (onboardingData) {
             console.log("[v0] User has completed onboarding, redirecting to user-section")
@@ -141,14 +141,14 @@ export const AuthSection = () => {
   }
 
   return (
-    <section id="auth-section" className="w-full px-8 py-16">
+    <section id="auth-section" className="w-full px-4 sm:px-6 md:px-8 py-12 sm:py-16 md:py-20">
       <div className="max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.645, 0.045, 0.355, 1] }}
           viewport={{ once: true }}
-          className="relative rounded-3xl p-8 md:p-10 overflow-hidden"
+          className="relative rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-10 overflow-hidden"
           style={{
             background: "rgba(255, 255, 255, 0.25)",
             backdropFilter: "blur(30px)",
@@ -159,20 +159,20 @@ export const AuthSection = () => {
         >
           {showConfirmation ? (
             <div className="flex flex-col items-center justify-center py-4">
-              <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-sm border border-[#e5e5e5]">
+              <div className="bg-white rounded-2xl p-4 sm:p-6 max-w-md w-full shadow-sm border border-[#e5e5e5]">
                 <div className="flex items-start gap-3 mb-4">
                   <div className="flex-shrink-0 w-10 h-10 bg-[#202020] rounded-lg flex items-center justify-center">
                     <CheckCircle2 className="w-5 h-5 text-white" />
                   </div>
                   <div className="flex-1">
                     <h3
-                      className="text-lg font-semibold text-[#202020] mb-1.5"
+                      className="text-base sm:text-lg font-semibold text-[#202020] mb-1.5"
                       style={{ fontFamily: "var(--font-figtree), Figtree" }}
                     >
                       Check your email to confirm
                     </h3>
                     <p
-                      className="text-sm text-[#404040] leading-relaxed"
+                      className="text-xs sm:text-sm text-[#404040] leading-relaxed"
                       style={{ fontFamily: "var(--font-figtree), Figtree" }}
                     >
                       You've successfully signed up. Please check your email to confirm your account before signing in
@@ -182,7 +182,7 @@ export const AuthSection = () => {
                 </div>
               </div>
               <p
-                className="text-center mt-6 text-sm text-[#404040]"
+                className="text-center mt-6 text-xs sm:text-sm text-[#404040]"
                 style={{ fontFamily: "var(--font-figtree), Figtree" }}
               >
                 Have an account?{" "}
@@ -200,17 +200,17 @@ export const AuthSection = () => {
           ) : (
             <>
               <h2
-                className="text-3xl md:text-4xl font-medium text-[#202020] text-center mb-8"
+                className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-medium text-[#202020] text-center mb-6 sm:mb-8"
                 style={{ fontFamily: "var(--font-figtree), Figtree" }}
               >
                 {mode === "signup" ? "Get Started with Finance Setu" : "Welcome Back to Finance Setu"}
               </h2>
 
-              <div className="flex flex-col lg:flex-row items-center justify-center gap-6 lg:gap-8">
-                <div className="flex-shrink-0">
+              <div className="flex flex-col sm:flex-col md:flex-row items-center justify-center gap-4 sm:gap-6 lg:gap-8">
+                <div className="flex-shrink-0 w-full sm:w-auto">
                   <button
                     onClick={handleGoogleAuth}
-                    className="flex items-center gap-3 px-6 py-3 bg-white rounded-xl border border-[#e5e5e5] hover:border-[#d0d0d0] transition-colors duration-200 shadow-sm hover:shadow-md"
+                    className="flex items-center justify-center gap-3 px-4 sm:px-6 py-3 bg-white rounded-xl border border-[#e5e5e5] hover:border-[#d0d0d0] transition-colors duration-200 shadow-sm hover:shadow-md w-full sm:w-auto"
                     style={{ fontFamily: "var(--font-figtree), Figtree" }}
                   >
                     <svg width="18" height="18" viewBox="0 0 24 24">
@@ -235,14 +235,16 @@ export const AuthSection = () => {
                   </button>
                 </div>
 
-                <div className="flex items-center gap-3 text-[#9a9a9a] text-sm">
-                  <div className="w-12 h-px bg-[#d0d0d0]" />
-                  <span style={{ fontFamily: "var(--font-figtree), Figtree" }}>OR</span>
-                  <div className="w-12 h-px bg-[#d0d0d0]" />
+                <div className="flex items-center gap-3 text-[#9a9a9a] text-xs sm:text-sm w-full md:w-auto">
+                  <div className="flex-1 md:flex-none h-px w-full md:w-12 bg-[#d0d0d0]" />
+                  <span style={{ fontFamily: "var(--font-figtree), Figtree" }} className="whitespace-nowrap">
+                    OR
+                  </span>
+                  <div className="flex-1 md:flex-none h-px w-full md:w-12 bg-[#d0d0d0]" />
                 </div>
 
-                <form onSubmit={handleEmailAuth} className="flex flex-col gap-3 w-full lg:w-auto">
-                  <div className="flex flex-col sm:flex-row gap-3">
+                <form onSubmit={handleEmailAuth} className="flex flex-col gap-3 w-full md:w-auto">
+                  <div className="flex flex-col sm:flex-row gap-3 w-full">
                     <input
                       type="email"
                       placeholder="Enter your email"
@@ -250,7 +252,7 @@ export const AuthSection = () => {
                       onChange={(e) => setEmail(e.target.value)}
                       required
                       disabled={isLoading}
-                      className="px-4 py-3 bg-white/80 backdrop-blur-sm rounded-xl border border-[#e5e5e5] focus:border-[#404040] focus:outline-none transition-colors duration-200 text-[#202020] placeholder:text-[#9a9a9a] text-sm w-full sm:w-auto sm:min-w-[200px] disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-3 sm:px-4 py-2 sm:py-3 bg-white/80 backdrop-blur-sm rounded-xl border border-[#e5e5e5] focus:border-[#404040] focus:outline-none transition-colors duration-200 text-[#202020] placeholder:text-[#9a9a9a] text-sm w-full sm:w-auto sm:min-w-[180px] disabled:opacity-50 disabled:cursor-not-allowed"
                       style={{ fontFamily: "var(--font-figtree), Figtree" }}
                     />
                     <input
@@ -261,7 +263,7 @@ export const AuthSection = () => {
                       required
                       minLength={6}
                       disabled={isLoading}
-                      className="px-4 py-3 bg-white/80 backdrop-blur-sm rounded-xl border border-[#e5e5e5] focus:border-[#404040] focus:outline-none transition-colors duration-200 text-[#202020] placeholder:text-[#9a9a9a] text-sm w-full sm:w-auto sm:min-w-[200px] disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-3 sm:px-4 py-2 sm:py-3 bg-white/80 backdrop-blur-sm rounded-xl border border-[#e5e5e5] focus:border-[#404040] focus:outline-none transition-colors duration-200 text-[#202020] placeholder:text-[#9a9a9a] text-sm w-full sm:w-auto sm:min-w-[180px] disabled:opacity-50 disabled:cursor-not-allowed"
                       style={{ fontFamily: "var(--font-figtree), Figtree" }}
                     />
                   </div>
@@ -284,7 +286,7 @@ export const AuthSection = () => {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="px-6 py-3 bg-[#202020] hover:bg-[#404040] text-white rounded-xl transition-colors duration-200 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 sm:px-6 py-2 sm:py-3 bg-[#202020] hover:bg-[#404040] text-white rounded-xl transition-colors duration-200 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed w-full"
                     style={{ fontFamily: "var(--font-figtree), Figtree" }}
                   >
                     {isLoading ? (mode === "signup" ? "Signing up..." : "Signing in...") : "Continue"}
@@ -293,7 +295,7 @@ export const AuthSection = () => {
               </div>
 
               <p
-                className="text-center mt-6 text-sm text-[#404040]"
+                className="text-center mt-6 text-xs sm:text-sm text-[#404040]"
                 style={{ fontFamily: "var(--font-figtree), Figtree" }}
               >
                 {mode === "signup" ? (

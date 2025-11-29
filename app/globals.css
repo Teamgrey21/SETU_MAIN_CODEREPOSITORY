@@ -4,34 +4,42 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
+  /* Updated color palette with blue, green, orange statement colors */
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
+
+  /* Primary statement color - Blue (#4B88A2) */
+  --primary: oklch(0.52 0.08 240);
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
+
+  /* Secondary - Green (#7EBC89) */
+  --secondary: oklch(0.72 0.12 160);
+  --secondary-foreground: oklch(0.145 0 0);
+
+  /* Accent - Orange (#F5A65B) */
+  --accent: oklch(0.75 0.15 60);
+  --accent-foreground: oklch(0.145 0 0);
+
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-1: oklch(0.52 0.08 240);
+  --chart-2: oklch(0.72 0.12 160);
+  --chart-3: oklch(0.75 0.15 60);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
   --radius: 0.625rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary: oklch(0.52 0.08 240);
   --sidebar-primary-foreground: oklch(0.985 0 0);
   --sidebar-accent: oklch(0.97 0 0);
   --sidebar-accent-foreground: oklch(0.205 0 0);
@@ -59,14 +67,14 @@
   --border: oklch(0.269 0 0);
   --input: oklch(0.269 0 0);
   --ring: oklch(0.439 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-1: oklch(0.52 0.08 240);
+  --chart-2: oklch(0.72 0.12 160);
+  --chart-3: oklch(0.75 0.15 60);
   --chart-4: oklch(0.627 0.265 303.9);
   --chart-5: oklch(0.645 0.246 16.439);
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary: oklch(0.52 0.08 240);
   --sidebar-primary-foreground: oklch(0.985 0 0);
   --sidebar-accent: oklch(0.269 0 0);
   --sidebar-accent-foreground: oklch(0.985 0 0);
@@ -75,11 +83,12 @@
 }
 
 @theme inline {
-  /* Updated font variables - body text now uses Figtree */
-  --font-sans: var(--font-figtree), "Figtree", "Figtree Fallback", system-ui, sans-serif;
-  --font-figtree: var(--font-figtree), "Figtree", "Figtree Fallback", system-ui, sans-serif;
-  /* Update font-mono to use Geist Mono variable */
+  /* Updated font stack with Space Grotesk for bold brutalist headings */
+  --font-sans: var(--font-inter), "Inter", system-ui, sans-serif;
+  --font-serif: var(--font-figtree), "Figtree", system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), "Geist Mono", "Geist Mono Fallback", ui-monospace, monospace;
+  --font-display: var(--font-space-grotesk), "Space Grotesk", system-ui, sans-serif;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -122,9 +131,69 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
-    /* Set body text to Figtree 18px */
-    @apply bg-background text-foreground text-lg;
-    font-family: var(--font-figtree), "Figtree", "Figtree Fallback", system-ui, sans-serif;
+    /* Body text uses Inter for clean readability */
+    @apply bg-background text-foreground;
+    font-family: var(--font-inter), "Inter", system-ui, sans-serif;
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  /* Typography scale with proper aspect ratios */
+  h1 {
+    font-family: var(--font-display), "Space Grotesk", system-ui, sans-serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  h2 {
+    font-family: var(--font-display), "Space Grotesk", system-ui, sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+
+  h3 {
+    font-family: var(--font-display), "Space Grotesk", system-ui, sans-serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  h4 {
+    font-family: var(--font-display), "Space Grotesk", system-ui, sans-serif;
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  h5 {
+    font-family: var(--font-serif), "Figtree", system-ui, sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    line-height: 1.5;
+  }
+
+  h6 {
+    font-family: var(--font-serif), "Figtree", system-ui, sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.5;
+  }
+
+  p {
+    font-family: var(--font-sans), "Inter", system-ui, sans-serif;
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  small {
+    font-family: var(--font-sans), "Inter", system-ui, sans-serif;
+    font-size: 0.875rem;
+    line-height: 1.5;
   }
 }

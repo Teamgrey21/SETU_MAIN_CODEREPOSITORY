@@ -80,11 +80,11 @@ const BankingScaleHero = () => {
   // @return
   return (
     <div className="w-full overflow-hidden bg-white">
-      <div className="mx-auto max-w-7xl px-8 py-24 pt-16">
-        <div className="grid grid-cols-12 gap-5 gap-y-16">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 md:px-8 py-12 sm:py-16 md:py-24 pt-8 sm:pt-12 md:pt-16">
+        <div className="grid grid-cols-12 gap-4 sm:gap-5 gap-y-8 sm:gap-y-12 md:gap-y-16">
           <div className="col-span-12 md:col-span-6 relative z-10">
             <div
-              className="relative h-6 inline-flex items-center font-mono uppercase text-xs text-[#167E6C] mb-12 px-2"
+              className="relative h-6 inline-flex items-center font-mono uppercase text-xs sm:text-sm text-[#167E6C] mb-8 sm:mb-12 px-2"
               style={{
                 fontFamily: "var(--font-geist-mono), 'Geist Mono', ui-monospace, monospace",
               }}
@@ -129,10 +129,9 @@ const BankingScaleHero = () => {
             </div>
 
             <h2
-              className="text-[40px] font-normal leading-tight tracking-tight text-[#111A4A] mb-6"
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-normal leading-tight tracking-tight text-[#111A4A] mb-4 sm:mb-6"
               style={{
                 fontFamily: "var(--font-figtree), Figtree",
-                fontSize: "40px",
                 fontWeight: "400",
               }}
             >
@@ -141,7 +140,6 @@ const BankingScaleHero = () => {
                 className="opacity-40"
                 style={{
                   fontWeight: "400",
-                  fontSize: "40px",
                 }}
               >
                 to simplify everything for you.
@@ -149,7 +147,7 @@ const BankingScaleHero = () => {
             </h2>
 
             <p
-              className="text-lg leading-6 text-[#111A4A] opacity-60 mt-0 mb-6"
+              className="text-base sm:text-lg leading-6 text-[#111A4A] opacity-60 mt-0 mb-4 sm:mb-6"
               style={{
                 fontFamily: "var(--font-figtree), Figtree",
               }}
@@ -170,9 +168,9 @@ const BankingScaleHero = () => {
 
           <div className="col-span-12">
             <div className="overflow-visible pb-5">
-              <div className="grid grid-cols-12 gap-5 relative z-10">
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-5 relative z-10">
                 {stats.map((stat, index) => (
-                  <div key={index} className="col-span-6 md:col-span-3">
+                  <div key={index} className="col-span-1">
                     <motion.div
                       initial={{
                         opacity: 0,
@@ -195,7 +193,7 @@ const BankingScaleHero = () => {
                       }}
                       className="flex flex-col gap-2"
                     >
-                      <p className="text-xs leading-[13.2px] text-[#7C7F88] m-0 whitespace-pre-line">
+                      <p className="text-xs sm:text-sm leading-[13.2px] sm:leading-4 text-[#7C7F88] m-0 whitespace-pre-line">
                         {stat.description}
                       </p>
                     </motion.div>

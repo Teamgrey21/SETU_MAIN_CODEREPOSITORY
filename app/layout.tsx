@@ -1,18 +1,25 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Figtree, Inter, Geist_Mono } from "next/font/google"
+import { Figtree, Inter, Geist_Mono, Space_Grotesk } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-space-grotesk",
+  weight: ["400", "500", "600", "700"],
+})
 
 const figtree = Figtree({
   subsets: ["latin"],
   variable: "--font-figtree",
-  weight: ["400", "500", "600"],
+  weight: ["400", "500", "600", "700"],
 })
 
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
+  weight: ["400", "500", "600", "700"],
 })
 
 const geistMono = Geist_Mono({
@@ -37,7 +44,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${figtree.variable} ${geistMono.variable} font-sans antialiased`}>
+      <body
+        className={`${inter.variable} ${figtree.variable} ${spaceGrotesk.variable} ${geistMono.variable} font-sans antialiased`}
+      >
         {children}
         <Analytics />
       </body>

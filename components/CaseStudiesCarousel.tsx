@@ -414,25 +414,24 @@ const CaseStudiesCarousel = () => {
   }
   return (
     <div
-      className="w-full min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center py-24 px-8"
+      className="w-full min-h-auto md:min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center py-4 md:py-12 lg:py-24 px-3 md:px-6 lg:px-8"
       onMouseEnter={() => setIsAutoPlaying(false)}
       onMouseLeave={() => setIsAutoPlaying(true)}
     >
       <div className="max-w-7xl w-full">
         {/* Section Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-4 md:mb-8 lg:mb-16">
           <h1
-            className="text-[40px] leading-tight font-normal text-foreground mb-6 tracking-tight"
+            className="text-2xl md:text-3xl lg:text-4xl leading-tight font-normal text-foreground mb-2 md:mb-4 lg:mb-6 tracking-tight"
             style={{
               fontWeight: "400",
               fontFamily: "var(--font-figtree), Figtree",
-              fontSize: "40px",
             }}
           >
             Learn and Rewrite Your Finance with Setu
           </h1>
           <p
-            className="text-lg leading-7 text-muted-foreground max-w-2xl mx-auto"
+            className="text-xs md:text-base lg:text-lg leading-5 md:leading-6 lg:leading-7 text-muted-foreground max-w-2xl mx-auto px-1 md:px-2"
             style={{
               fontFamily: "var(--font-figtree), Figtree",
             }}
@@ -441,9 +440,9 @@ const CaseStudiesCarousel = () => {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="grid lg:grid-cols-2 gap-4 md:gap-8 lg:gap-12 items-center">
           {/* Left Content */}
-          <div className="space-y-8">
+          <div className="space-y-6 md:space-y-8">
             <AnimatePresence mode="wait" custom={direction}>
               <motion.div
                 key={currentStudy.id}
@@ -462,14 +461,13 @@ const CaseStudiesCarousel = () => {
                     duration: 0.2,
                   },
                 }}
-                className="space-y-6"
+                className="space-y-4 md:space-y-6"
               >
                 <h2
-                  className="text-4xl font-bold text-foreground leading-tight tracking-tight"
+                  className="text-xl md:text-3xl lg:text-4xl font-bold text-foreground leading-tight tracking-tight"
                   style={{
                     fontFamily: "var(--font-figtree), Figtree",
                     fontWeight: "400",
-                    fontSize: "32px",
                   }}
                 >
                   {currentStudy.title}
@@ -481,22 +479,21 @@ const CaseStudiesCarousel = () => {
                   ))}
                 </div>
 
-                <blockquote className="border-l-4 border-primary pl-6 py-2">
+                <blockquote className="border-l-4 border-primary pl-4 md:pl-6 py-2">
                   <p
-                    className="text-lg leading-7 text-foreground/80 italic mb-3"
+                    className="text-base md:text-lg lg:text-xl leading-6 md:leading-7 lg:leading-8 text-foreground/80 italic mb-3"
                     style={{
                       fontFamily: "var(--font-figtree), Figtree",
                     }}
                   >
                     "{currentStudy.quote}"
                   </p>
-                  
                 </blockquote>
               </motion.div>
             </AnimatePresence>
 
             {/* Navigation */}
-            <div className="flex items-center gap-6">
+            <div className="flex flex-col sm:flex-row items-center gap-4 md:gap-6">
               <div className="flex gap-2">
                 {caseStudies.map((_, idx) => (
                   <button
@@ -544,7 +541,7 @@ const CaseStudiesCarousel = () => {
           </div>
 
           {/* Right Content - Card Visualization */}
-          <div className="relative h-[500px] flex items-center justify-center">
+          <div className="relative h-64 md:h-96 lg:h-[500px] flex items-center justify-center mt-8 md:mt-0">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentStudy.id}

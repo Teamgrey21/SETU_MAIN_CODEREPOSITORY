@@ -90,6 +90,7 @@ export default function UserSectionPage() {
   const [isLoadingData, setIsLoadingData] = useState(true)
   const [userEmail, setUserEmail] = useState("")
   const [userId, setUserId] = useState("")
+  const [sessionId, setSessionId] = useState<string>("")
 
   const [newsItems, setNewsItems] = useState<NewsItem[]>([])
   const [chatHistory, setChatHistory] = useState<ChatConversation[]>([])
@@ -99,6 +100,50 @@ export default function UserSectionPage() {
   const [isLoadingChats, setIsLoadingChats] = useState(true)
   const [isLoadingSummaries, setIsLoadingSummaries] = useState(true)
   const [isLoadingAnalysis, setIsLoadingAnalysis] = useState(true)
+
+  const [isTeachEasySidebarOpen, setIsTeachEasySidebarOpen] = useState(false)
+  const [teachEasyMessages, setTeachEasyMessages] = useState<Array<{ type: "user" | "bot"; text: string }>>([])
+  const [teachEasyInput, setTeachEasyInput] = useState("")
+  const [isTeachEasyProcessing, setIsTeachEasyProcessing] = useState(false)
+
+  // Educational videos data
+  const educationalVideos = [
+    {
+      id: 1,
+      title: "Understanding Personal Finance Basics",
+      channel: "Finance Setu",
+      duration: "12:45",
+      url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    },
+    {
+      id: 2,
+      title: "How to Create a Budget",
+      channel: "Finance Setu",
+      duration: "8:30",
+      url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    },
+    {
+      id: 3,
+      title: "Investment Strategies for Beginners",
+      channel: "Finance Setu",
+      duration: "15:20",
+      url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    },
+    {
+      id: 4,
+      title: "Tax Planning 101",
+      channel: "Finance Setu",
+      duration: "11:15",
+      url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    },
+    {
+      id: 5,
+      title: "Emergency Fund Essentials",
+      channel: "Finance Setu",
+      duration: "9:50",
+      url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    },
+  ]
 
   useEffect(() => {
     const fetchAllData = async () => {
@@ -177,6 +222,12 @@ export default function UserSectionPage() {
 
     fetchAllData()
   }, [router])
+
+  useEffect(() => {
+    // Generate a unique session ID for this chat session
+    const newSessionId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+    setSessionId(newSessionId)
+  }, [])
 
   const initializeAnalysisData = async (supabase: any, userId: string, onboardingData: any) => {
     try {
@@ -553,6 +604,7 @@ export default function UserSectionPage() {
     { name: "Ask Setu", icon: MessageSquare },
     { name: "Financial Summaries", icon: FileText },
     { name: "Chat History", icon: History },
+    // Teach Easy is now only accessible from the Ask Setu chat interface
   ]
 
   const bottomMenuItems = [
@@ -568,21 +620,26 @@ export default function UserSectionPage() {
     setInputValue("")
     setIsProcessing(true)
 
+    setIsSidebarCollapsed(true)
+
     try {
       console.log("[v0] Sending message to n8n webhook:", userMessage)
 
-      const response = await fetch("https://finance-setu.app.n8n.cloud/webhook/chat-ai-agent", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        "https://finance-setu.app.n8n.cloud/webhook/fdce938b-83d1-49e0-9cc6-79b8d9c2ea4a/chat",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            message: userMessage,
+            user_id: userId,
+            session_id: sessionId,
+            timestamp: new Date().toISOString(),
+          }),
         },
-        body: JSON.stringify({
-          message: userMessage,
-          userId: userId,
-          userEmail: userEmail,
-          timestamp: new Date().toISOString(),
-        }),
-      })
+      )
 
       if (!response.ok) {
         throw new Error(`API request failed with status ${response.status}`)
@@ -604,6 +661,58 @@ export default function UserSectionPage() {
       ])
     } finally {
       setIsProcessing(false)
+    }
+  }
+
+  // Handle Teach Easy send message
+  const handleTeachEasySendMessage = async () => {
+    if (!teachEasyInput.trim()) return
+
+    const userMessage = teachEasyInput.trim()
+    setTeachEasyMessages([...teachEasyMessages, { type: "user", text: userMessage }])
+    setTeachEasyInput("")
+    setIsTeachEasyProcessing(true)
+
+    try {
+      console.log("[v0] Sending message to Teach Easy n8n webhook:", userMessage)
+
+      const response = await fetch(
+        "https://finance-setu.app.n8n.cloud/webhook/fdce938b-83d1-49e0-9cc6-79b8d9c2ea4a/teach",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            message: userMessage,
+            user_id: userId,
+            session_id: sessionId,
+            timestamp: new Date().toISOString(),
+          }),
+        },
+      )
+
+      if (!response.ok) {
+        throw new Error(`API request failed with status ${response.status}`)
+      }
+
+      const data = await response.json()
+      console.log("[v0] Received response from Teach Easy n8n:", data)
+
+      const botMessage =
+        data.response || data.message || data.output || "I'm here to help you learn about personal finance!"
+      setTeachEasyMessages((prev) => [...prev, { type: "bot", text: botMessage }])
+    } catch (error) {
+      console.error("[v0] Error calling Teach Easy n8n webhook:", error)
+      setTeachEasyMessages((prev) => [
+        ...prev,
+        {
+          type: "bot",
+          text: "Sorry, I encountered an error processing your request. Please try again.",
+        },
+      ])
+    } finally {
+      setIsTeachEasyProcessing(false)
     }
   }
 
@@ -1215,6 +1324,14 @@ export default function UserSectionPage() {
                       className="flex-1 bg-transparent outline-none text-[#202020] placeholder:text-[#9ca3af]"
                       style={{ fontFamily: "var(--font-figtree), Figtree" }}
                     />
+                    {/* ADDED: Teach Easy button */}
+                    <button
+                      onClick={() => setIsTeachEasySidebarOpen(!isTeachEasySidebarOpen)}
+                      className="p-1.5 hover:bg-[#e5e7eb] rounded-lg transition-colors text-[#6b7280] hover:text-[#202020]"
+                      title="Teach Easy - Learn Finance"
+                    >
+                      <Sparkles className="w-5 h-5" />
+                    </button>
                     <button className="p-1.5 hover:bg-[#e5e7eb] rounded-lg transition-colors">
                       <Settings className="w-5 h-5 text-[#6b7280]" />
                     </button>
@@ -1230,6 +1347,132 @@ export default function UserSectionPage() {
             )}
           </>
         )}
+
+        {/* Teach Easy Sidebar */}
+        {/* ADDED: Teach Easy sidebar with chatbot and YouTube videos */}
+        <aside
+          className={`fixed right-0 top-0 h-screen bg-white border-l border-[#e5e5e5] flex flex-col transition-all duration-300 z-50 ${
+            isTeachEasySidebarOpen ? "w-96" : "w-0"
+          } overflow-hidden`}
+        >
+          {/* Header */}
+          <div className="p-6 border-b border-[#e5e5e5] flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-[#202020]" style={{ fontFamily: "var(--font-figtree), Figtree" }}>
+              Teach Easy
+            </h2>
+            <button
+              onClick={() => setIsTeachEasySidebarOpen(false)}
+              className="p-1.5 hover:bg-[#f0f0f0] rounded-lg transition-colors"
+            >
+              <ChevronRight className="w-5 h-5 text-[#6b7280]" />
+            </button>
+          </div>
+
+          {/* Content Tabs */}
+          <div className="flex-1 flex flex-col overflow-hidden">
+            {/* Chat Section */}
+            <div className="flex-1 flex flex-col min-h-0">
+              <div className="p-4 border-b border-[#e5e5e5] bg-[#f9fafb]">
+                <p
+                  className="text-sm font-medium text-[#202020]"
+                  style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                >
+                  Learning Assistant
+                </p>
+              </div>
+
+              {/* Chat Messages */}
+              <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                {teachEasyMessages.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full gap-3 text-center">
+                    <Sparkles className="w-8 h-8 text-[#9ca3af]" />
+                    <p className="text-sm text-[#6b7280]" style={{ fontFamily: "var(--font-figtree), Figtree" }}>
+                      Ask me anything about personal finance and investing!
+                    </p>
+                  </div>
+                ) : (
+                  teachEasyMessages.map((msg, idx) => (
+                    <div key={idx} className={`flex ${msg.type === "user" ? "justify-end" : "justify-start"}`}>
+                      <div
+                        className={`max-w-xs px-4 py-2 rounded-lg ${
+                          msg.type === "user" ? "bg-[#202020] text-white" : "bg-[#f0f0f0] text-[#202020]"
+                        }`}
+                      >
+                        <p className="text-sm" style={{ fontFamily: "var(--font-figtree), Figtree" }}>
+                          {msg.text}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* Chat Input */}
+              <div className="border-t border-[#e5e5e5] p-4">
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Ask..."
+                    value={teachEasyInput}
+                    onChange={(e) => setTeachEasyInput(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleTeachEasySendMessage()}
+                    className="flex-1 px-3 py-2 bg-[#f0f0f0] border border-[#e5e5e5] rounded-lg outline-none focus:ring-2 focus:ring-[#202020]/20 text-sm"
+                    style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                  />
+                  <button
+                    onClick={handleTeachEasySendMessage}
+                    disabled={isTeachEasyProcessing}
+                    className="p-2 bg-[#202020] text-white rounded-lg hover:bg-[#404040] transition-colors disabled:opacity-50"
+                  >
+                    <Send className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Divider */}
+            <div className="h-px bg-[#e5e5e5]" />
+
+            {/* Videos Section */}
+            <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+              <div className="p-4 border-b border-[#e5e5e5] bg-[#f9fafb]">
+                <p
+                  className="text-sm font-medium text-[#202020]"
+                  style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                >
+                  Educational Videos
+                </p>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                {educationalVideos.map((video) => (
+                  <a
+                    key={video.id}
+                    href={video.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block p-3 bg-[#f9fafb] hover:bg-[#f0f0f0] rounded-lg transition-colors border border-[#e5e5e5] group"
+                  >
+                    <p
+                      className="text-sm font-medium text-[#202020] group-hover:text-blue-600 line-clamp-2 mb-1"
+                      style={{ fontFamily: "var(--font-figtree), Figtree" }}
+                    >
+                      {video.title}
+                    </p>
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-xs text-[#6b7280]" style={{ fontFamily: "var(--font-figtree), Figtree" }}>
+                        {video.channel}
+                      </p>
+                      <p className="text-xs text-[#9ca3af]" style={{ fontFamily: "var(--font-figtree), Figtree" }}>
+                        {video.duration}
+                      </p>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+        </aside>
 
         {activeSection === "Financial Summaries" && (
           <div className="flex-1 flex flex-col bg-[#f9fafb] p-8 gap-6 overflow-y-auto">
